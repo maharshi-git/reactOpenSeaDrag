@@ -28,6 +28,17 @@
   color: #61dafb;
 }
 
+.highlight {
+  background-color: rgba(255, 0, 0, 0.5); /* semi-transparent red */
+  border: 2px solid red;
+}
+
+.info-strip {
+  background-color: #f8f9fa;
+  padding: 1rem;
+  margin-bottom: 1rem;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);

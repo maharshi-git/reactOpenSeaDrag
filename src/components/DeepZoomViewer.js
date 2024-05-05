@@ -5,13 +5,12 @@ import "@recogito/annotorious-openseadragon/dist/annotorious.min.css";
 import "openseadragon-filtering";
 import OpenSeadragonImagingHelper from "@openseadragon-imaging/openseadragon-imaginghelper";
 
-const DeepZoomViewer = ({ tileSources, slide, onZoomPress, setViewer2 }) => {
+const DeepZoomViewer = ({ tileSources, slide, onZoomPress, setViewer2, imgHelperValues }) => {
   const viewerRef = useRef();
 
-  const [brightness, setBrightness] = useState(100);
-  const [gamma, setGamma] = useState(1);
-  const [contrast, setContrast] = useState(100);
-  const [viewer, setViewer] = useState(null); // Define the viewer state variable here
+  
+  const [viewer, setViewer] = useState(null); // Define the viewer state variable here 
+  
 
   useEffect(() => {
     // Create the OpenSeadragon viewer
@@ -32,20 +31,9 @@ const DeepZoomViewer = ({ tileSources, slide, onZoomPress, setViewer2 }) => {
         maxZoomLevel: 8,
         minZoomLevel: 1,
         ajaxWithCredentials: false, // Add this line
-        crossOriginPolicy: "Anonymous" // And this line
-        // toolbar:       "toolbarDiv"
-        
+        crossOriginPolicy: "Anonymous", // And this line
+        // toolbar:       "toolbarDiv"      
       });
-
-      viewer.addOverlay({
-        id: "right-arrow-overlay",
-        x: 0.2008,
-        y: 0.4778,
-        placement: "RIGHT",
-        checkResize: false,
-      });
-
-      //add a transluscent overlay to the viewer
 
       viewer.addHandler("open", function () {
         var getTileUrl = viewer.source.getTileUrl;
@@ -107,33 +95,43 @@ const DeepZoomViewer = ({ tileSources, slide, onZoomPress, setViewer2 }) => {
         },
       });
 
-      var imagingHelper = new OpenSeadragonImagingHelper({ viewer: viewer });
-      console.log(imagingHelper);
+      viewer.addOverlay({
+        id: "example-overlay",
+        x: 0.33,
+        y: 0.75,
+        width: 0.2,
+        height: 0.25,
+        className: "highlight",
+      });
 
-      viewer.open(image);
 
-      viewer.canvas.style.filter = `brightness(${brightness}%) contrast(${contrast}%) gamma(${gamma})`;
+      // var viewer = OpenSeadragon({...});
+      var imagingHelper = viewer.activateImagingHelper({
+        onImageViewChanged: onImageViewChanged,
+      });
+
+      function onImageViewChanged(event) {       
+
+        let obj = {
+          zoomFactor: event.zoomFactor,
+          viewportWidth: event.viewportWidth,
+          viewportHeight: event.viewportHeight,
+          viewportOrigin: event.viewportOrigin,
+          viewportCenter: event.viewportCenter
+        }
+        imgHelperValues(obj)
+        
+        // console.log(event);
+      }
+
+      viewer.open(image);      
 
       setViewer(viewer);
       setViewer2(viewer);
     }
   }, [tileSources]);
 
-  const updateFilterBrigtness = (oEvent) => {
-    console.log(oEvent.target.value);
-    viewer.canvas.style.filter = `brightness(${oEvent.target.value}%)`;
-    setBrightness(oEvent.target.value);
-  };
-  const updateFilterContrast = (oEvent) => {
-    console.log(oEvent.target.value);
-    viewer.canvas.style.filter = `contrast(${oEvent.target.value}%)`;
-    setContrast(oEvent.target.value);
-  };
-  const updateFilterGamma = (oEvent) => {
-    console.log(oEvent.target.value);
-    viewer.canvas.style.filter = `gamma(${oEvent.target.value}%)`;
-    setGamma(oEvent.target.value);
-  };
+
 
   return (
     <div>

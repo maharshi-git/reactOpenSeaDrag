@@ -4,6 +4,8 @@ import "@recogito/annotorious-openseadragon/dist/annotorious.min.css";
 
 import DeepZoomMain from "./components/DeepZoomMain";
 import FileViewer from "./components/FileViewer";
+
+import "./App.css";
 // import React, { useEffect, useRef } from "react";
 
 // deepzoom components

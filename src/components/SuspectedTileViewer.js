@@ -4,12 +4,21 @@ import imagereport from "../resources/Roles 5.jpg";
 
 import { ToggleButton, ToggleButtonGroup } from "react-bootstrap";
 
-const SuspectedTileViewer = ({ onZoomPress, updateFilterBrigtness, updateFilterContrast, updateFilterGamma }) => {
+const SuspectedTileViewer = ({
+  onZoomPress,
+  updateFilterBrigtness,
+  updateFilterContrast,
+  updateFilterGamma,
+}) => {
   //api call to get coordinates of selected file from the server
 
   // const [toggleValueSlides, setToggleValueSlides] = useState(1);
   // const [toggleValueImage, setToggleValueImage] = useState(0);
   const [toggleValue, setToggleValue] = useState("affected");
+
+  const [gamma, setGamma] = useState(1);
+  const [contrast, setContrast] = useState(100);
+  const [brightness, setBrightness] = useState(100);
 
   const images = [
     { src: imagereport, alt: "Image 1", zoom: 2, x: 0.5, y: 0.5 },
@@ -82,17 +91,32 @@ const SuspectedTileViewer = ({ onZoomPress, updateFilterBrigtness, updateFilterC
     setToggleValue(val);
   };
 
-  const updateFilterBrigtness2 = (oEvent) =>{
-    updateFilterBrigtness(oEvent)
-  }
+  const updateFilterBrigtness2 = (oEvent) => {
+    setBrightness(oEvent.target.value);
+
+    let filterObj = {
+      brightness: oEvent.target.value,
+      contrast: contrast,
+      gamma: gamma,
+    };
+    
+    updateFilterBrigtness(filterObj);
+  };
 
   const updateFilterContrast2 = (oEvent) => {
-    updateFilterContrast(oEvent);
-  }
+    setContrast(oEvent.target.value);
+    let filterObj = {
+      brightness: brightness,
+      contrast: oEvent.target.value,
+      gamma: gamma,
+    };
+    updateFilterContrast(filterObj);
+  };
 
   const updateFilterGamma2 = (oEvent) => {
-    updateFilterGamma(oEvent)
-  }
+    setGamma(oEvent.target.value);
+    updateFilterGamma(oEvent);
+  };
 
   return (
     <div className="container">
@@ -101,7 +125,7 @@ const SuspectedTileViewer = ({ onZoomPress, updateFilterBrigtness, updateFilterC
         name="options"
         value={toggleValue}
         onChange={handleChange}
-        style={{marginLeft: "0.8rem", marginBottom: "1rem", width: "100%"}}
+        style={{ marginLeft: "0.8rem", marginBottom: "1rem", width: "100%" }}
       >
         <ToggleButton id="toggle-check" value={"affected"}>
           Affected Slides
@@ -152,14 +176,20 @@ const SuspectedTileViewer = ({ onZoomPress, updateFilterBrigtness, updateFilterC
         className="mt-3"
         style={{ display: toggleValue === "adjust" ? "block" : "none" }}
       >
-        <div style={{display: "flex", flexDirection: "column", marginLeft: "0.8rem"}}>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            marginLeft: "0.8rem",
+          }}
+        >
           <label>
             Brightness
             <input
               type="range"
               min="0"
               max="200"
-              // value={brightness}
+              value={brightness}
               onChange={updateFilterBrigtness2}
               tooltip="true"
               class="form-range"
@@ -171,7 +201,7 @@ const SuspectedTileViewer = ({ onZoomPress, updateFilterBrigtness, updateFilterC
               type="range"
               min="0"
               max="200"
-              // value={contrast}
+              value={contrast}
               onChange={updateFilterContrast2}
               class="form-range"
             />
@@ -183,7 +213,7 @@ const SuspectedTileViewer = ({ onZoomPress, updateFilterBrigtness, updateFilterC
               min="0"
               max="2"
               step="0.1"
-              // value={gamma}
+              value={gamma}
               onChange={updateFilterGamma2}
               class="form-range"
             />
