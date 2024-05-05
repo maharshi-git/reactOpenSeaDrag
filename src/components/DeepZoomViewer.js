@@ -32,20 +32,20 @@ const DeepZoomViewer = ({ tileSources, slide, onZoomPress, setViewer2 }) => {
         maxZoomLevel: 8,
         minZoomLevel: 1,
         ajaxWithCredentials: false, // Add this line
-        crossOriginPolicy: "Anonymous", // And this line
+        crossOriginPolicy: "Anonymous" // And this line
         // toolbar:       "toolbarDiv"
+        
       });
 
       viewer.addOverlay({
-        id: "example-overlay",
-        x: 0.33,
-        y: 0.75,
-        width: 0.2,
-        height: 0.25,
-        className: "highlight",
+        id: "right-arrow-overlay",
+        x: 0.2008,
+        y: 0.4778,
+        placement: "RIGHT",
+        checkResize: false,
       });
 
-      //add a highlight class for the overlay
+      //add a transluscent overlay to the viewer
 
       viewer.addHandler("open", function () {
         var getTileUrl = viewer.source.getTileUrl;
