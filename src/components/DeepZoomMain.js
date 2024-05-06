@@ -14,20 +14,34 @@ function DeepZoomMain() {
   const [zoomLevel, setZoomLevel] = useState();
   const [viewportHeight, setViewportHeight] = useState();
   const [viewportWidth, setViewportWidth] = useState();
-  const [viewrportcenter, setViewportCenter] = useState({x: 0, y: 0});
-  const [viewportOrigin, setViewportOrigin] = useState({x: 0, y: 0});
+  const [viewrportcenter, setViewportCenter] = useState({ x: 0, y: 0 });
+  const [viewportOrigin, setViewportOrigin] = useState({ x: 0, y: 0 });
 
-  
+  const [coordClick, setCoordClick] = useState({zoom:0, x:0, y:0});
 
+  const [showOSD, setShowOSD] = useState(false);
 
-  const onZoomPress = (zoomLevel, xCoord, yCoord) => {
-    console.log(zoomLevel, xCoord, yCoord);
-    // viewer.viewport.zoomTo(2);
-    // viewer.viewport.panTo(new OpenSeadragon.Point(0.5, 0.5));
-    viewer.viewport.zoomTo(zoomLevel);
-    viewer.viewport.panTo(new OpenSeadragon.Point(xCoord, yCoord));
-    viewer.forceRedraw();
+  const onZoomPress = (zoomLevel, xCoord, yCoord) => {   
+    
+    if(viewer){
+
+      viewer.viewport.zoomTo(zoomLevel);
+      viewer.viewport.panTo(new OpenSeadragon.Point(xCoord, yCoord));
+      viewer.forceRedraw();      
+    }
+      
+    
   };
+
+  // const setViewAndZoom = (viewer, zoomLevel, xCoord, yCoord) => {
+
+  //   setViewer(viewer);
+
+  //   viewer.viewport.zoomTo(zoomLevel);
+  //   viewer.viewport.panTo(new OpenSeadragon.Point(xCoord, yCoord));
+  //   viewer.forceRedraw();    
+
+  // };
 
   const imgHelperValues = (obj) => {
     setZoomLevel(obj.zoomFactor.toFixed(2));
@@ -35,23 +49,25 @@ function DeepZoomMain() {
     setViewportWidth(obj.viewportWidth.toFixed(2));
     setViewportCenter(obj.viewportCenter);
     setViewportOrigin(obj.viewportOrigin);
-
   };
 
   const updateFilterBrigtness = (filterObj) => {
-  
-    viewer.canvas.style.filter = `brightness(${filterObj.brightness}%) contrast(${filterObj.contrast}%)`;
-    
+    viewer.canvas.style.filter = `brightness(${filterObj.brightness}%) contrast(${filterObj.contrast}%) saturate(${filterObj.saturation}%)`;
   };
   const updateFilterContrast = (filterObj) => {
-    
-    viewer.canvas.style.filter = `brightness(${filterObj.brightness}%) contrast(${filterObj.contrast}%)`;
-    
+    viewer.canvas.style.filter = `brightness(${filterObj.brightness}%) contrast(${filterObj.contrast}%) saturate(${filterObj.saturation}%)`;
   };
-  const updateFilterGamma = (oEvent) => {
-    
-    viewer.canvas.style.filter = `gamma(${oEvent.target.value}%)`;
-    
+  const updateFilterGamma = (filterObj) => {
+    viewer.canvas.style.filter = `brightness(${filterObj.brightness}%) contrast(${filterObj.contrast}%) saturate(${filterObj.saturation}%) gamma(${filterObj.gamma})`;
+  };
+
+  //write a similart method for saturation
+  const updateFilterSaturation = (filterObj) => {
+    viewer.canvas.style.filter = `brightness(${filterObj.brightness}%) contrast(${filterObj.contrast}%) saturate(${filterObj.saturation}%)`;
+  };
+
+  const onShowOSD = (stat) => {
+    setShowOSD(stat);
   };
 
   return (
@@ -61,25 +77,32 @@ function DeepZoomMain() {
       {/* <DeepZoomViewer tileSources="https://openseadragon.github.io/example-images/highsmith/highsmith.dzi" slide={slide}/> */}
 
       <div style={{ display: "flex" }}>
-        <div style={{ width: "50%", margin: "1rem" }}>
+        <div style={{ width: "100%", margin: "1rem" }}>
           <SuspectedTileViewer
             onZoomPress={onZoomPress}
             updateFilterBrigtness={updateFilterBrigtness}
             updateFilterContrast={updateFilterContrast}
             updateFilterGamma={updateFilterGamma}
+            updateFilterSaturation={updateFilterSaturation}
+            onShowOSD={onShowOSD}
           ></SuspectedTileViewer>
         </div>
 
-        <div style={{ marginTop: "1rem", marginRight: "1rem", border: "none" }}>
-          <DeepZoomViewer
-            setViewer2={setViewer}
-            imgHelperValues={imgHelperValues}
-          />
-          <Row className="info-strip">
-            <Col>zoomLevel : {zoomLevel}</Col>
-            <Col>viewport Height: {viewportHeight}</Col>
-            <Col>viewport Width: {viewportWidth}</Col>
-            <Col>
+        {/* //if showOSD is true then render a text here */}
+        {showOSD && (
+          <div
+            style={{ marginTop: "1rem", marginRight: "1rem", border: "none" }}
+          >
+            <DeepZoomViewer
+              setViewer2={setViewer}
+              imgHelperValues={imgHelperValues}
+              onShowOSD={onShowOSD}
+            />
+            <Row className="info-strip">
+              <Col>zoomLevel : {zoomLevel}</Col>
+              <Col>viewport Height: {viewportHeight}</Col>
+              <Col>viewport Width: {viewportWidth}</Col>
+              {/* <Col>
               Viewport Center
               <Col>x: {viewrportcenter.x.toFixed(2)}</Col>
               <Col>y: {viewrportcenter.y.toFixed(2)}</Col>
@@ -87,9 +110,10 @@ function DeepZoomMain() {
             <Col>Viewport Origin
               <Col>x: {viewportOrigin.x.toFixed(2)}</Col>
               <Col>y: {viewportOrigin.y.toFixed(2)}</Col>
-            </Col>
-          </Row>
-        </div>
+            </Col> */}
+            </Row>
+          </div>
+        )}
       </div>
     </div>
   );

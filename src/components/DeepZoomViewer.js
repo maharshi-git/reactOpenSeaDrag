@@ -5,7 +5,7 @@ import "@recogito/annotorious-openseadragon/dist/annotorious.min.css";
 import "openseadragon-filtering";
 import OpenSeadragonImagingHelper from "@openseadragon-imaging/openseadragon-imaginghelper";
 
-const DeepZoomViewer = ({ tileSources, slide, onZoomPress, setViewer2, imgHelperValues }) => {
+const DeepZoomViewer = ({ tileSources, setViewer2, imgHelperValues, onShowOSD, coordClick }) => {
   const viewerRef = useRef();
 
   
@@ -124,10 +124,18 @@ const DeepZoomViewer = ({ tileSources, slide, onZoomPress, setViewer2, imgHelper
         // console.log(event);
       }
 
-      viewer.open(image);      
+      viewer.open(image);    
+      
+      // viewer.viewport.zoomTo(coordClick.zoomLevel);
+      // viewer.viewport.panTo(new OpenSeadragon.Point(coordClick.xCoord, coordClick.yCoord));
+      // viewer.forceRedraw();   
 
       setViewer(viewer);
       setViewer2(viewer);
+
+      
+
+        
     }
   }, [tileSources]);
 
@@ -135,6 +143,7 @@ const DeepZoomViewer = ({ tileSources, slide, onZoomPress, setViewer2, imgHelper
 
   return (
     <div>
+      <button onClick={() => onShowOSD(false)}>x</button>
       <div
         id="viewer"
         ref={viewerRef}

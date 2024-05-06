@@ -9,6 +9,8 @@ const SuspectedTileViewer = ({
   updateFilterBrigtness,
   updateFilterContrast,
   updateFilterGamma,
+  updateFilterSaturation,
+  onShowOSD,
 }) => {
   //api call to get coordinates of selected file from the server
 
@@ -19,6 +21,9 @@ const SuspectedTileViewer = ({
   const [gamma, setGamma] = useState(1);
   const [contrast, setContrast] = useState(100);
   const [brightness, setBrightness] = useState(100);
+  const [saturation, setSaturation] = useState(100);
+  const [slidesPerScreen, setSlidesPerScreen] = useState(16);
+  const [slidesClass, setSlidesClass] = useState("col-md-3");
 
   const images = [
     { src: imagereport, alt: "Image 1", zoom: 2, x: 0.5, y: 0.5 },
@@ -69,7 +74,7 @@ const SuspectedTileViewer = ({
   ];
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(15);
+  const [itemsPerPage, setItemsPerPage] = useState(16);
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -77,10 +82,21 @@ const SuspectedTileViewer = ({
 
   const handleImageClick = (zoom, x, y) => {
     // console.log(`Clicked on image: ${src}`);
+    onShowOSD(true);
+    setItemsPerPage(16);
+    setSlidesClass("col-md-4");
     onZoomPress(zoom, x, y, 0.5);
   };
 
-  const handlePageClick = (pageNumber) => setCurrentPage(pageNumber);
+  const handlePageClick = (pageNumber) => {
+    if (
+      pageNumber < 1 ||
+      pageNumber > Math.ceil(images.length / itemsPerPage)
+    ) {
+      return;
+    }
+    setCurrentPage(pageNumber);
+  };
 
   const pageNumbers = [];
   for (let i = 1; i <= Math.ceil(images.length / itemsPerPage); i++) {
@@ -98,8 +114,9 @@ const SuspectedTileViewer = ({
       brightness: oEvent.target.value,
       contrast: contrast,
       gamma: gamma,
+      saturation: saturation,
     };
-    
+
     updateFilterBrigtness(filterObj);
   };
 
@@ -109,18 +126,92 @@ const SuspectedTileViewer = ({
       brightness: brightness,
       contrast: oEvent.target.value,
       gamma: gamma,
+      saturation: saturation,
     };
     updateFilterContrast(filterObj);
   };
 
   const updateFilterGamma2 = (oEvent) => {
     setGamma(oEvent.target.value);
-    updateFilterGamma(oEvent);
+    let filterObj = {
+      brightness: brightness,
+      contrast: contrast,
+      gamma: oEvent.target.value,
+      saturation: saturation,
+    };
+    updateFilterGamma(filterObj);
+  };
+
+  //write a similar function for saturation
+  const updateFilterSaturation2 = (oEvent) => {
+    setSaturation(oEvent.target.value);
+    let filterObj = {
+      brightness: brightness,
+      contrast: contrast,
+      gamma: gamma,
+      saturation: oEvent.target.value,
+    };
+    updateFilterSaturation(filterObj);
+  };
+
+  const resetFilters = function () {
+    setBrightness(100);
+    setContrast(100);
+    setGamma(1);
+    setSaturation(100);
+    let filterObj = {
+      brightness: 100,
+      contrast: 100,
+      gamma: 1,
+      saturation: 100,
+    };
+    updateFilterBrigtness(filterObj);
+  };
+
+  const changeScreen = (param) => {
+    if (param === "+") {
+      // setSlidesPerScreen(slidesPerScreen + 1);
+      // slidesClass
+      switch (itemsPerPage) {
+        case 1:
+          setItemsPerPage(4);
+          setSlidesClass("col-md-6");
+          break;
+        case 4:
+          setItemsPerPage(9);
+          setSlidesClass("col-md-4");
+          break;
+        case 9:
+          setItemsPerPage(16);
+          setSlidesClass("col-md-3");
+          break;
+        default:
+          break;
+      }
+      // col-md-3
+    } else {
+      switch (itemsPerPage) {
+        case 16:
+          setItemsPerPage(9);
+          setSlidesClass("col-md-4");
+          break;
+        case 9:
+          setItemsPerPage(4);
+          setSlidesClass("col-md-6");
+          break;
+        case 4:
+          setItemsPerPage(1);
+          setSlidesClass("col-md-12");
+          break;
+        default:
+          break;
+      }
+    }
   };
 
   return (
     <div className="container">
-      <ToggleButtonGroup
+      {/* <ToggleButtonGroup
         type="radio"
         name="options"
         value={toggleValue}
@@ -133,15 +224,32 @@ const SuspectedTileViewer = ({
         <ToggleButton id="toggle-check2" value={"adjust"}>
           Adjust Slides
         </ToggleButton>
-      </ToggleButtonGroup>
+      </ToggleButtonGroup> */}
 
       <div
         className="container"
         style={{ display: toggleValue === "adjust" ? "none" : "block" }}
       >
         <div className="row">
+          <div style={{ display: "flex" }}>
+            <button
+              className="btn btn-primary"
+              style={{ marginLeft: "1rem", marginRight: "1rem" }}
+              onClick={() => changeScreen("-")}
+            >
+              -
+            </button>
+            <p>{itemsPerPage}</p>
+            <button
+              className="btn btn-primary"
+              style={{ marginLeft: "1rem", marginRight: "1rem" }}
+              onClick={() => changeScreen("+")}
+            >
+              +
+            </button>
+          </div>
           {currentItems.map((image, index) => (
-            <div key={index} className="col-md-4 mb-4">
+            <div id="tileViewer" key={index} className={slidesClass}>
               <div className="card">
                 <button
                   style={{ border: "none", padding: 0 }}
@@ -158,18 +266,38 @@ const SuspectedTileViewer = ({
           ))}
         </div>
         <nav>
-          <ul className="pagination">
-            {pageNumbers.map((number) => (
-              <li key={number} className="page-item">
+          <div style={{ overflow: "auto" }}>
+            <ul className="pagination">
+              <li className="page-item">
                 <a
-                  onClick={() => handlePageClick(number)}
+                  onClick={() => handlePageClick(currentPage - 1)}
                   className="page-link"
+                  disabled={currentPage === 1}
                 >
-                  {number}
+                  Previous
                 </a>
               </li>
-            ))}
-          </ul>
+              {pageNumbers.map((number) => (
+                <li key={number} className="page-item">
+                  <a
+                    onClick={() => handlePageClick(number)}
+                    className="page-link"
+                  >
+                    {number}
+                  </a>
+                </li>
+              ))}
+              <li className="page-item">
+        <a
+          onClick={() => handlePageClick(currentPage + 1)}
+          className="page-link"
+          disabled={currentPage === pageNumbers.length}
+        >
+          Next
+        </a>
+      </li>
+            </ul>
+          </div>
         </nav>
       </div>
       <div
@@ -183,6 +311,9 @@ const SuspectedTileViewer = ({
             marginLeft: "0.8rem",
           }}
         >
+          <button className="btn btn-primary" onClick={resetFilters}>
+            Reset
+          </button>
           <label>
             Brightness
             <input
@@ -211,10 +342,21 @@ const SuspectedTileViewer = ({
             <input
               type="range"
               min="0"
-              max="2"
+              max="5"
               step="0.1"
               value={gamma}
               onChange={updateFilterGamma2}
+              class="form-range"
+            />
+          </label>
+          <label>
+            Saturation
+            <input
+              type="range"
+              min="0"
+              max="200"
+              value={saturation}
+              onChange={updateFilterSaturation2}
               class="form-range"
             />
           </label>

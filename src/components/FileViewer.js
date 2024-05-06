@@ -33,13 +33,16 @@ const FileViewer = () => {
       <h2>People</h2>
       <ul className="list-group">
         {people.map((person) => (
-          <li
-            key={person.id}
-            className="list-group-item"
-            onClick={handleItemClick}
-          >
-            <Link to="/about">{person.name}</Link>
-          </li>
+          <Link to="/about">
+            
+            <li
+              key={person.id}
+              className="list-group-item"
+              onClick={handleItemClick}
+            >
+                <p>{person.name}</p>
+            </li>
+          </Link>
         ))}
       </ul>
     </div>
