@@ -42,10 +42,17 @@ const SuspectedTileViewer = () => {
 
 
         let annotDetArr = []
-        let xywh
+        let xywh, id
         for (var i = 0; i < annotDet.length; i++) {
           xywh = `xywh=pixel:${annotDet[i].coordinates.x},${annotDet[i].coordinates.y},${annotDet[i].coordinates.width},${annotDet[i].coordinates.height}`
-          annotDetArr.push(xywh);
+          id = annotDet[i].id
+          let annotObj = {
+            xywh: xywh,
+            id: id
+
+          }
+          
+          annotDetArr.push(annotObj);
         }
         setAnnotArr(annotDetArr);
 
@@ -56,6 +63,8 @@ const SuspectedTileViewer = () => {
 
     fetchData();
   }, []);
+
+  
 
   const images = [
     { src: imagereport, alt: "Image 1", zoom: 2, x: 0.5, y: 0.5 },
@@ -112,7 +121,10 @@ const SuspectedTileViewer = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = images.slice(indexOfFirstItem, indexOfLastItem);
 
-  const handleClose = () => setShow(false);
+  const handleClose = () => {
+    setShow(false);
+    fetchData();
+  }
 
 
 
@@ -123,50 +135,6 @@ const SuspectedTileViewer = () => {
     setYCoord(y);
     setShow(true);
   };
-
-  // const loadAnnotation = async () => {
-  //   //api call to get coordinates of selected file from the server
-  //   let annotDet = await onFetchData("http://localhost:5000/getSavedAnnotation", "GET", {});
-  //   let annotDetArr = []
-  //   let xywh
-  //   for (var i = 0; i < annotDet.length; i++) {
-  //     xywh = `xywh=pixel:${annotDet[i].coordinates.x},${annotDet[i].coordinates.y},${annotDet[i].w},${annotDet[i].h}`
-  //     annotDetArr.push(xywh);
-  //   }
-  //   setAnnotArr(annotDetArr);
-  //   // let 
-
-  // }
-
-  // const onFetchData = async (path, mthod, body) => {
-  //   //write code for fetching data from server based on
-  //   return new Promise((resolve, reject) => {
-
-  //     fetch(path, {
-  //       method: mthod,
-  //       headers: {
-  //         'Content-Type': 'application/json'
-  //       },
-  //       body: JSON.stringify(body)
-  //     })
-  //       .then(response => {
-  //         if (!response.ok) {
-  //           throw new Error(`HTTP error! status: ${response.status}`);
-  //         }
-  //         return response.json();
-  //       })
-  //       .then(data => {
-  //         resolve(data);
-  //       })
-  //       .catch(error => {
-  //         console.error('There was a problem with the fetch operation: ', error);
-  //         reject(error);
-  //       });
-
-  //   })
-  // }
-
-  // loadAnnotation();
 
 
 
@@ -210,6 +178,47 @@ const SuspectedTileViewer = () => {
     }
     // setItemsPerPage(event.target.value);
   }
+
+  const fetchData = async () => {
+    const path = 'http://localhost:5000/getSavedAnnotation'; // Replace with your API path
+    const method = 'GET'; // Replace with your method
+    const body = {}; // Replace with your body
+
+    try {
+      const response = await fetch(path, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const annotDet = await response.json();
+      // setData(data);
+
+
+      let annotDetArr = []
+      let xywh, id
+      for (var i = 0; i < annotDet.length; i++) {
+        xywh = `xywh=pixel:${annotDet[i].coordinates.x},${annotDet[i].coordinates.y},${annotDet[i].coordinates.width},${annotDet[i].coordinates.height}`
+        id = annotDet[i].id
+        let annotObj = {
+          xywh: xywh,
+          id: id
+
+        }
+        
+        annotDetArr.push(annotObj);
+      }
+      setAnnotArr(annotDetArr);
+
+    } catch (error) {
+      console.error('There was a problem with the fetch operation: ', error);
+    }
+  };
 
   return (
     <div className="container">

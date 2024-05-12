@@ -91,7 +91,7 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr })
 
         anno.addAnnotation({
           "@context": "http://www.w3.org/ns/anno.jsonld",
-          id: `anno2${i}`,
+          id: annotDetArr[i].id,
           type: "Annotation",
           body: {
             type: "TextualBody",
@@ -104,7 +104,7 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr })
               type: "FragmentSelector",
               conformsTo: "http://www.w3.org/TR/media-frags/",
               // value: "xywh=pixel:5000,5000,4000,4000", // Replace with your annotation coordinates
-              value: annotDetArr[i], // Replace with your annotation coordinates
+              value: annotDetArr[i].xywh, // Replace with your annotation coordinates
             },
           },
         });
