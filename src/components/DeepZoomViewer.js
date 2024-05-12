@@ -5,12 +5,16 @@ import "@recogito/annotorious-openseadragon/dist/annotorious.min.css";
 import "openseadragon-filtering";
 import OpenSeadragonImagingHelper from "@openseadragon-imaging/openseadragon-imaginghelper";
 
-const DeepZoomViewer = ({ tileSources, setViewer2, imgHelperValues, onShowOSD, coordClick }) => {
+const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord }) => {
   const viewerRef = useRef();
 
-  
+
   const [viewer, setViewer] = useState(null); // Define the viewer state variable here 
-  
+
+  const [zoomLevelView, setZoomLevelView] = useState();
+  const [viewportHeight, setViewportHeight] = useState();
+  const [viewportWidth, setViewportWidth] = useState();
+
 
   useEffect(() => {
     // Create the OpenSeadragon viewer
@@ -110,40 +114,42 @@ const DeepZoomViewer = ({ tileSources, setViewer2, imgHelperValues, onShowOSD, c
         onImageViewChanged: onImageViewChanged,
       });
 
-      function onImageViewChanged(event) {       
+      function onImageViewChanged(event) {
 
-        let obj = {
-          zoomFactor: event.zoomFactor,
-          viewportWidth: event.viewportWidth,
-          viewportHeight: event.viewportHeight,
-          viewportOrigin: event.viewportOrigin,
-          viewportCenter: event.viewportCenter
-        }
-        imgHelperValues(obj)
-        
-        // console.log(event);
+        setZoomLevelView(event.zoomFactor.toFixed(2));
+        setViewportHeight(event.viewportWidth.toFixed(2));
+        setViewportWidth(event.viewportHeight.toFixed(2));
+
       }
 
-      viewer.open(image);    
-      
+      viewer.open(image);
+
       // viewer.viewport.zoomTo(coordClick.zoomLevel);
       // viewer.viewport.panTo(new OpenSeadragon.Point(coordClick.xCoord, coordClick.yCoord));
       // viewer.forceRedraw();   
 
       setViewer(viewer);
-      setViewer2(viewer);
+      // setViewer2(viewer);
 
-      
+      viewer.viewport.zoomTo(zoomLevel);
+      viewer.viewport.panTo(new OpenSeadragon.Point(xCoord, yCoord));
+      viewer.forceRedraw();
 
-        
+
     }
   }, [tileSources]);
+
+  // const onZoomPress = (zoomLevel, xCoord, yCoord) => {
+
+  
+
+  // };
 
 
 
   return (
     <div>
-      <button onClick={() => onShowOSD(false)}>x</button>
+      {/* <button onClick={() => onShowOSD(false)}>x</button> */}
       <div
         id="viewer"
         ref={viewerRef}

@@ -21,17 +21,17 @@ function DeepZoomMain() {
 
   const [showOSD, setShowOSD] = useState(false);
 
-  const onZoomPress = (zoomLevel, xCoord, yCoord) => {   
+  // const onZoomPress = (zoomLevel, xCoord, yCoord) => {   
     
-    if(viewer){
+  //   if(viewer){
 
-      viewer.viewport.zoomTo(zoomLevel);
-      viewer.viewport.panTo(new OpenSeadragon.Point(xCoord, yCoord));
-      viewer.forceRedraw();      
-    }
+  //     viewer.viewport.zoomTo(zoomLevel);
+  //     viewer.viewport.panTo(new OpenSeadragon.Point(xCoord, yCoord));
+  //     viewer.forceRedraw();      
+  //   }
       
     
-  };
+  // };
 
   // const setViewAndZoom = (viewer, zoomLevel, xCoord, yCoord) => {
 
@@ -66,9 +66,9 @@ function DeepZoomMain() {
     viewer.canvas.style.filter = `brightness(${filterObj.brightness}%) contrast(${filterObj.contrast}%) saturate(${filterObj.saturation}%)`;
   };
 
-  const onShowOSD = (stat) => {
-    setShowOSD(stat);
-  };
+  // const onShowOSD = (stat) => {
+  //   setShowOSD(stat);
+  // };
 
   return (
     <div className="App">
@@ -79,12 +79,12 @@ function DeepZoomMain() {
       <div style={{ display: "flex" }}>
         <div style={{ width: "100%", margin: "1rem" }}>
           <SuspectedTileViewer
-            onZoomPress={onZoomPress}
+            // onZoomPress={onZoomPress}
             updateFilterBrigtness={updateFilterBrigtness}
             updateFilterContrast={updateFilterContrast}
             updateFilterGamma={updateFilterGamma}
             updateFilterSaturation={updateFilterSaturation}
-            onShowOSD={onShowOSD}
+            // onShowOSD={onShowOSD}
           ></SuspectedTileViewer>
         </div>
 
@@ -96,7 +96,7 @@ function DeepZoomMain() {
             <DeepZoomViewer
               setViewer2={setViewer}
               imgHelperValues={imgHelperValues}
-              onShowOSD={onShowOSD}
+              // onShowOSD={onShowOSD}
             />
             <Row className="info-strip">
               <Col>zoomLevel : {zoomLevel}</Col>

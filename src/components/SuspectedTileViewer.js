@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 
 import imagereport from "../resources/Roles 5.jpg";
-
-import { ToggleButton, ToggleButtonGroup } from "react-bootstrap";
+import { Button, Modal } from 'react-bootstrap';
+import DeepZoomViewer from "./DeepZoomViewer";
 
 const SuspectedTileViewer = ({
   onZoomPress,
@@ -10,7 +10,7 @@ const SuspectedTileViewer = ({
   updateFilterContrast,
   updateFilterGamma,
   updateFilterSaturation,
-  onShowOSD,
+  // onShowOSD,
 }) => {
   //api call to get coordinates of selected file from the server
 
@@ -22,8 +22,13 @@ const SuspectedTileViewer = ({
   const [contrast, setContrast] = useState(100);
   const [brightness, setBrightness] = useState(100);
   const [saturation, setSaturation] = useState(100);
-  const [slidesPerScreen, setSlidesPerScreen] = useState(16);
+  // const [slidesPerScreen, setSlidesPerScreen] = useState(16);
   const [slidesClass, setSlidesClass] = useState("col-md-3");
+  const [show, setShow] = useState(false);
+
+  const [zoomLevel, setZoomLevel] = useState();
+  const [xCoord, setXCoord] = useState();
+  const [yCoord, setYCoord] = useState();
 
   const images = [
     { src: imagereport, alt: "Image 1", zoom: 2, x: 0.5, y: 0.5 },
@@ -80,12 +85,25 @@ const SuspectedTileViewer = ({
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = images.slice(indexOfFirstItem, indexOfLastItem);
 
+
+  const handleClose = () => setShow(false);
+
   const handleImageClick = (zoom, x, y) => {
     // console.log(`Clicked on image: ${src}`);
-    onShowOSD(true);
-    setItemsPerPage(16);
-    setSlidesClass("col-md-4");
-    onZoomPress(zoom, x, y, 0.5);
+    // onShowOSD(true);
+    // setItemsPerPage(16);
+    // setSlidesClass("col-md-4");
+    // onZoomPress(zoom, x, y, 0.5);
+    // setZoomLevel(obj.zoomFactor.toFixed(2));
+    // setViewportHeight(obj.viewportHeight.toFixed(2));
+    // setViewportWidth(obj.viewportWidth.toFixed(2));
+
+    setZoomLevel(zoom);
+    setXCoord(x);
+    setYCoord(y);
+
+    setShow(true);
+
   };
 
   const handlePageClick = (pageNumber) => {
@@ -226,6 +244,18 @@ const SuspectedTileViewer = ({
         </ToggleButton>
       </ToggleButtonGroup> */}
 
+      <Modal show={show} onHide={handleClose} fullscreen={true}>
+        <Modal.Header closeButton>
+          <Modal.Title>OpenSeadragon Viewer</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <DeepZoomViewer zoomLevel={zoomLevel} xCoord={xCoord} yCoord={yCoord} ></DeepZoomViewer>
+        </Modal.Body>
+        <Modal.Footer>
+
+        </Modal.Footer>
+      </Modal>
+
       <div
         className="container"
         style={{ display: toggleValue === "adjust" ? "none" : "block" }}
@@ -288,14 +318,14 @@ const SuspectedTileViewer = ({
                 </li>
               ))}
               <li className="page-item">
-        <a
-          onClick={() => handlePageClick(currentPage + 1)}
-          className="page-link"
-          disabled={currentPage === pageNumbers.length}
-        >
-          Next
-        </a>
-      </li>
+                <a
+                  onClick={() => handlePageClick(currentPage + 1)}
+                  className="page-link"
+                  disabled={currentPage === pageNumbers.length}
+                >
+                  Next
+                </a>
+              </li>
             </ul>
           </div>
         </nav>
