@@ -81,6 +81,12 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr })
 
       const anno = Annotorious(viewer, {});
 
+      anno.on('deleteAnnotation', async (annotation) => {
+        // console.log(annotation);
+        anno.removeAnnotation(annotation.id);
+        await onFetchData('http://127.0.0.1:5000/deleteAnnotation', 'POST', {id: annotation.id})
+      });
+
       anno.on("createAnnotation", async function (annotation) {
         console.log(annotation);
         await onFetchData('http://127.0.0.1:5000/getAnnotation', 'POST', annotation)
