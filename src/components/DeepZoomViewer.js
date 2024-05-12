@@ -85,13 +85,26 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord }) => {
         console.log(annotation);
 
         // Send a POST request with the annotation data
-        // fetch('https://your-api-endpoint.com', {
-        //   method: 'POST',
-        //   headers: {
-        //     'Content-Type': 'application/json'
-        //   },
-        //   body: JSON.stringify(annotation)
-        // });
+        fetch('http://127.0.0.1:5000/getAnnotation', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(annotation)
+        }) 
+          .then(response => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+          })
+          .then(data => {
+            // Use the data
+          })
+          .catch(error => {
+            console.error('There was a problem with the fetch operation: ', error);
+          });
+
       });
 
       // const annotDet = await annotationDetails() //api call to get annotation details
@@ -126,11 +139,11 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord }) => {
       });
 
 
- 
+
       // var imagingHelper = viewer.activateImagingHelper({
       //   onImageViewChanged: onImageViewChanged,
       // });
- 
+
       viewer.activateImagingHelper({
         onImageViewChanged: onImageViewChanged,
       });
@@ -146,7 +159,7 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord }) => {
       viewer.open(image);
 
       setViewer(viewer);
-    
+
 
     }
   }, [tileSources, zoomLevel, xCoord, yCoord]);
@@ -184,7 +197,7 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord }) => {
     setGamma(1);
     setSaturation(100);
     viewer.canvas.style.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
-  
+
   };
 
 
