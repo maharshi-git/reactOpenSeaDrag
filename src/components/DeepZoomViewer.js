@@ -7,7 +7,7 @@ import OpenSeadragonImagingHelper from "@openseadragon-imaging/openseadragon-ima
 
 import { Row, Col } from "react-bootstrap";
 
-const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord }) => {
+const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr }) => {
   const viewerRef = useRef();
 
 
@@ -81,53 +81,35 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord }) => {
 
       const anno = Annotorious(viewer, {});
 
-      anno.on("createAnnotation", function (annotation) {
+      anno.on("createAnnotation", async function (annotation) {
         console.log(annotation);
-
-        // Send a POST request with the annotation data
-        fetch('http://127.0.0.1:5000/getAnnotation', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(annotation)
-        }) 
-          .then(response => {
-            if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-          })
-          .then(data => {
-            // Use the data
-          })
-          .catch(error => {
-            console.error('There was a problem with the fetch operation: ', error);
-          });
+        await onFetchData('http://127.0.0.1:5000/getAnnotation', 'POST', annotation)
 
       });
 
-      // const annotDet = await annotationDetails() //api call to get annotation details
-      // anno.addAnnotation(annotDet)
+      for (var i in annotDetArr) {       
 
-      anno.addAnnotation({
-        "@context": "http://www.w3.org/ns/anno.jsonld",
-        id: "anno2",
-        type: "Annotation",
-        body: {
-          type: "TextualBody",
-          value: "This is a default annotation",
-          format: "text/plain",
-        },
-        target: {
-          source: "http://example.com/image.jpg", // Replace with your image URL
-          selector: {
-            type: "FragmentSelector",
-            conformsTo: "http://www.w3.org/TR/media-frags/",
-            value: "xywh=pixel:5000,5000,4000,4000", // Replace with your annotation coordinates
+        anno.addAnnotation({
+          "@context": "http://www.w3.org/ns/anno.jsonld",
+          id: `anno2${i}`,
+          type: "Annotation",
+          body: {
+            type: "TextualBody",
+            value: "This is a default annotation",
+            format: "text/plain",
           },
-        },
-      });
+          target: {
+            source: "http://example.com/image.jpg", // Replace with your image URL
+            selector: {
+              type: "FragmentSelector",
+              conformsTo: "http://www.w3.org/TR/media-frags/",
+              // value: "xywh=pixel:5000,5000,4000,4000", // Replace with your annotation coordinates
+              value: annotDetArr[i], // Replace with your annotation coordinates
+            },
+          },
+        });
+      }
+
 
       viewer.addOverlay({
         id: "example-overlay",
@@ -163,6 +145,40 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord }) => {
 
     }
   }, [tileSources, zoomLevel, xCoord, yCoord]);
+
+  const getSavedAnnotation = async () => {
+    let savedData = await onFetchData('http://127.0.0.1:5000/getSavedAnnotation', 'GET',)
+    return savedData;
+  };
+
+  const onFetchData = async (path, mthod, body) => {
+    //write code for fetching data from server based on
+    return new Promise((resolve, reject) => {
+
+      fetch(path, {
+        method: mthod,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(body)
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          resolve(data);
+        })
+        .catch(error => {
+          console.error('There was a problem with the fetch operation: ', error);
+          reject(error);
+        });
+
+    })
+  }
+
 
   const onZoomPress = (zoomLevel, xCoord, yCoord) => {
 

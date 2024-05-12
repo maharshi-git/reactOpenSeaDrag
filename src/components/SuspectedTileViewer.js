@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import imagereport from "../resources/Roles 5.jpg";
 import { Modal } from 'react-bootstrap';
@@ -15,6 +15,47 @@ const SuspectedTileViewer = () => {
   const [zoomLevel, setZoomLevel] = useState();
   const [xCoord, setXCoord] = useState();
   const [yCoord, setYCoord] = useState();
+
+  const [annotArr, setAnnotArr] = useState([]);
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const path = 'http://localhost:5000/getSavedAnnotation'; // Replace with your API path
+      const method = 'GET'; // Replace with your method
+      const body = {}; // Replace with your body
+
+      try {
+        const response = await fetch(path, {
+          method: method,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const annotDet = await response.json();
+        // setData(data);
+
+
+        let annotDetArr = []
+        let xywh
+        for (var i = 0; i < annotDet.length; i++) {
+          xywh = `xywh=pixel:${annotDet[i].coordinates.x},${annotDet[i].coordinates.y},${annotDet[i].coordinates.width},${annotDet[i].coordinates.height}`
+          annotDetArr.push(xywh);
+        }
+        setAnnotArr(annotDetArr);
+
+      } catch (error) {
+        console.error('There was a problem with the fetch operation: ', error);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const images = [
     { src: imagereport, alt: "Image 1", zoom: 2, x: 0.5, y: 0.5 },
@@ -73,12 +114,61 @@ const SuspectedTileViewer = () => {
 
   const handleClose = () => setShow(false);
 
+
+
   const handleImageClick = (zoom, x, y) => {
+    // loadAnnotation();loadAnnotation
     setZoomLevel(zoom);
     setXCoord(x);
     setYCoord(y);
     setShow(true);
   };
+
+  // const loadAnnotation = async () => {
+  //   //api call to get coordinates of selected file from the server
+  //   let annotDet = await onFetchData("http://localhost:5000/getSavedAnnotation", "GET", {});
+  //   let annotDetArr = []
+  //   let xywh
+  //   for (var i = 0; i < annotDet.length; i++) {
+  //     xywh = `xywh=pixel:${annotDet[i].coordinates.x},${annotDet[i].coordinates.y},${annotDet[i].w},${annotDet[i].h}`
+  //     annotDetArr.push(xywh);
+  //   }
+  //   setAnnotArr(annotDetArr);
+  //   // let 
+
+  // }
+
+  // const onFetchData = async (path, mthod, body) => {
+  //   //write code for fetching data from server based on
+  //   return new Promise((resolve, reject) => {
+
+  //     fetch(path, {
+  //       method: mthod,
+  //       headers: {
+  //         'Content-Type': 'application/json'
+  //       },
+  //       body: JSON.stringify(body)
+  //     })
+  //       .then(response => {
+  //         if (!response.ok) {
+  //           throw new Error(`HTTP error! status: ${response.status}`);
+  //         }
+  //         return response.json();
+  //       })
+  //       .then(data => {
+  //         resolve(data);
+  //       })
+  //       .catch(error => {
+  //         console.error('There was a problem with the fetch operation: ', error);
+  //         reject(error);
+  //       });
+
+  //   })
+  // }
+
+  // loadAnnotation();
+
+
 
   const handlePageClick = (pageNumber) => {
     if (
@@ -130,7 +220,7 @@ const SuspectedTileViewer = () => {
           <Modal.Title>OpenSeadragon Viewer</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          <DeepZoomViewer zoomLevel={zoomLevel} xCoord={xCoord} yCoord={yCoord} ></DeepZoomViewer>
+          <DeepZoomViewer zoomLevel={zoomLevel} xCoord={xCoord} yCoord={yCoord} annotDetArr={annotArr}></DeepZoomViewer>
         </Modal.Body>
         <Modal.Footer>
 
@@ -211,8 +301,8 @@ const SuspectedTileViewer = () => {
             min={4}
             step={4}
             onChange={onChangeItemsPerPage}
-            style={{ height: "80vh"}}
-         
+            style={{ height: "80vh" }}
+
           />
         </div>
       </div>
