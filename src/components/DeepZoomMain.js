@@ -71,12 +71,12 @@ function DeepZoomMain() {
   // };
 
   return (
-    <div className="App">
+    <div className="App" style={{boxSizing: "border-box", height:"1rem"}}>
       {/* <Toolbar style={{ "margin-bottom": "1rem" }} /> */}
       {/* <SideMenu /> */}
       {/* <DeepZoomViewer tileSources="https://openseadragon.github.io/example-images/highsmith/highsmith.dzi" slide={slide}/> */}
 
-      <div style={{ display: "flex" }}>
+      <div style={{ display: "flex", boxSizing: "border-box", height:"1rem" }}>
         <div style={{ width: "100%", margin: "1rem" }}>
           <SuspectedTileViewer
             // onZoomPress={onZoomPress}

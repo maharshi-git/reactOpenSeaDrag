@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import imagereport from "../resources/Roles 5.jpg";
 import { Button, Modal } from 'react-bootstrap';
 import DeepZoomViewer from "./DeepZoomViewer";
+import Slider from '@mui/material/Slider';
+
 
 const SuspectedTileViewer = ({
   onZoomPress,
@@ -84,6 +86,29 @@ const SuspectedTileViewer = ({
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = images.slice(indexOfFirstItem, indexOfLastItem);
+
+  // useEffect(() => {
+  //   const handleScroll = (event) => {
+
+  //     console.log('hello')
+  //     if (event.deltaY < 0) {
+  //       // Scrolling up, increase the number of items per page
+  //       // setItemsPerPage((prevItemsPerPage) => Math.min(prevItemsPerPage + 1, images.length));
+  //       changeScreen("-")
+  //     } else {
+  //       // Scrolling down, decrease the number of items per page
+  //       // setItemsPerPage((prevItemsPerPage) => Math.max(prevItemsPerPage - 1, 1));
+  //       changeScreen("+")
+  //     }
+  //   };
+
+  //   window.addEventListener('wheel', handleScroll);
+
+  //   // Clean up the event listener when the component is unmounted
+  //   return () => {
+  //     window.removeEventListener('wheel', handleScroll);
+  //   };
+  // }, [images.length]);
 
 
   const handleClose = () => setShow(false);
@@ -227,6 +252,31 @@ const SuspectedTileViewer = ({
     }
   };
 
+  const onChangeItemsPerPage = function (event) {
+    // return "test"
+    switch (event.target.value) {
+      case 4:
+        setItemsPerPage(1);
+        setSlidesClass("col-md-12");
+        break;
+      case 8:
+        setItemsPerPage(4);
+        setSlidesClass("col-md-6");
+        break;
+      case 12:
+        setItemsPerPage(9);
+        setSlidesClass("col-md-4");
+        break;
+      case 16:
+        setItemsPerPage(16);
+        setSlidesClass("col-md-3");
+        break;
+      default:
+        break;
+    }
+    // setItemsPerPage(event.target.value);
+  }
+
   return (
     <div className="container">
 
@@ -243,142 +293,86 @@ const SuspectedTileViewer = ({
         </Modal.Footer>
       </Modal>
 
-      <div
-        className="container"
-        style={{ display: toggleValue === "adjust" ? "none" : "block" }}
-      >
-        <div className="row">
-          <div style={{ display: "flex" }}>
-            <button
-              className="btn btn-primary"
-              style={{ marginLeft: "1rem", marginRight: "1rem" }}
-              onClick={() => changeScreen("-")}
-            >
-              -
-            </button>
-            <p>{itemsPerPage}</p>
-            <button
-              className="btn btn-primary"
-              style={{ marginLeft: "1rem", marginRight: "1rem" }}
-              onClick={() => changeScreen("+")}
-            >
-              +
-            </button>
-          </div>
-          {currentItems.map((image, index) => (
-            <div id="tileViewer" key={index} className={slidesClass}>
-              <div className="card">
-                <button
-                  style={{ border: "none", padding: 0 }}
-                  onClick={() => handleImageClick(image.zoom, image.x, image.y)}
-                >
-                  <img
-                    src={image.src}
-                    alt={image.alt}
-                    className="card-img-top"
-                  />
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-        <nav>
-          <div style={{ overflow: "auto" }}>
-            <ul className="pagination">
-              <li className="page-item">
-                <a
-                  onClick={() => handlePageClick(currentPage - 1)}
-                  className="page-link"
-                  disabled={currentPage === 1}
-                >
-                  Previous
-                </a>
-              </li>
-              {pageNumbers.map((number) => (
-                <li key={number} className="page-item">
-                  <a
-                    onClick={() => handlePageClick(number)}
-                    className="page-link"
+
+      <div style={{ display: "flex" }}>
+        <div
+          className="container"
+        >
+          <div className="row" >
+            {currentItems.map((image, index) => (
+              <div id="tileViewer" key={index} className={slidesClass}>
+                <div className="card">
+                  <button
+                    style={{ border: "none", padding: 0 }}
+                    onClick={() => handleImageClick(image.zoom, image.x, image.y)}
                   >
-                    {number}
+                    <img
+                      src={image.src}
+                      alt={image.alt}
+                      className="card-img-top"
+                    />
+                  </button>
+                </div>
+              </div>
+            ))}
+
+          </div>
+          <nav>
+            <div style={{ overflow: "auto" }}>
+              <ul className="pagination">
+                <li className="page-item">
+                  <a
+                    onClick={() => handlePageClick(currentPage - 1)}
+                    className="page-link"
+                    disabled={currentPage === 1}
+                  >
+                    Previous
                   </a>
                 </li>
-              ))}
-              <li className="page-item">
-                <a
-                  onClick={() => handlePageClick(currentPage + 1)}
-                  className="page-link"
-                  disabled={currentPage === pageNumbers.length}
-                >
-                  Next
-                </a>
-              </li>
-            </ul>
-          </div>
-        </nav>
-      </div>
-      <div
-        className="mt-3"
-        style={{ display: toggleValue === "adjust" ? "block" : "none" }}
-      >
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            marginLeft: "0.8rem",
-          }}
-        >
-          <button className="btn btn-primary" onClick={resetFilters}>
-            Reset
-          </button>
-          <label>
-            Brightness
-            <input
-              type="range"
-              min="0"
-              max="200"
-              value={brightness}
-              onChange={updateFilterBrigtness2}
-              tooltip="true"
-              class="form-range"
-            />
-          </label>
-          <label>
-            Contrast
-            <input
-              type="range"
-              min="0"
-              max="200"
-              value={contrast}
-              onChange={updateFilterContrast2}
-              class="form-range"
-            />
-          </label>
-          <label>
-            Gamma
-            <input
-              type="range"
-              min="0"
-              max="5"
-              step="0.1"
-              value={gamma}
-              onChange={updateFilterGamma2}
-              class="form-range"
-            />
-          </label>
-          <label>
-            Saturation
-            <input
-              type="range"
-              min="0"
-              max="200"
-              value={saturation}
-              onChange={updateFilterSaturation2}
-              class="form-range"
-            />
-          </label>
+                {pageNumbers.map((number) => (
+                  <li key={number} className="page-item">
+                    <a
+                      onClick={() => handlePageClick(number)}
+                      className="page-link"
+                    >
+                      {number}
+                    </a>
+                  </li>
+                ))}
+                <li className="page-item">
+                  <a
+                    onClick={() => handlePageClick(currentPage + 1)}
+                    className="page-link"
+                    disabled={currentPage === pageNumbers.length}
+                  >
+                    Next
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </nav>
+        </div>
+        <div >
+          <Slider
+            sx={{
+              '& input[type="range"]': {
+                WebkitAppearance: 'slider-vertical',
+              },
+            }}
+            orientation="vertical"
+            defaultValue={itemsPerPage}
+            aria-label="Temperature"
+            valueLabelDisplay="auto"
+            max={16}
+            min={4}
+            step={4}
+            onChange={onChangeItemsPerPage}
+            style={{ height: "80vh"}}
+          // onKeyDown={preventHorizontalKeyboardNavigation}
+          />
         </div>
       </div>
+
     </div>
   );
 };
