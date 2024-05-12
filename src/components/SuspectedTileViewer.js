@@ -303,7 +303,7 @@ const SuspectedTileViewer = ({
               <div id="tileViewer" key={index} className={slidesClass}>
                 <div className="card">
                   <button
-                    style={{ border: "none", padding: 0 }}
+                    style={{ border: "none", padding: 0, marginLeft: "-20px" }}
                     onClick={() => handleImageClick(image.zoom, image.x, image.y)}
                   >
                     <img
