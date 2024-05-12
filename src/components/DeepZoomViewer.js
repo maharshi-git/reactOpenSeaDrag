@@ -5,6 +5,8 @@ import "@recogito/annotorious-openseadragon/dist/annotorious.min.css";
 import "openseadragon-filtering";
 import OpenSeadragonImagingHelper from "@openseadragon-imaging/openseadragon-imaginghelper";
 
+import { Row, Col, Button } from "react-bootstrap";
+
 const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord }) => {
   const viewerRef = useRef();
 
@@ -15,9 +17,24 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord }) => {
   const [viewportHeight, setViewportHeight] = useState();
   const [viewportWidth, setViewportWidth] = useState();
 
+  const [zoomLevelMain, setZoomLevelMain] = useState();
+  const [xCoordMain, setXCoordMain] = useState();
+  const [yCoordMain, setYCoordMain] = useState();
+
+
+  const [gamma, setGamma] = useState(1);
+  const [contrast, setContrast] = useState(100);
+  const [brightness, setBrightness] = useState(100);
+  const [saturation, setSaturation] = useState(100);
+
+
+
 
   useEffect(() => {
-    // Create the OpenSeadragon viewer
+
+    setZoomLevelMain(zoomLevel);
+    setXCoordMain(xCoord);
+    setYCoordMain(yCoord);
 
     if (!viewer) {
       const viewer = OpenSeadragon({
@@ -124,75 +141,132 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord }) => {
 
       viewer.open(image);
 
-      // viewer.viewport.zoomTo(coordClick.zoomLevel);
-      // viewer.viewport.panTo(new OpenSeadragon.Point(coordClick.xCoord, coordClick.yCoord));
-      // viewer.forceRedraw();   
-
       setViewer(viewer);
       // setViewer2(viewer);
 
-      viewer.viewport.zoomTo(zoomLevel);
-      viewer.viewport.panTo(new OpenSeadragon.Point(xCoord, yCoord));
-      viewer.forceRedraw();
-
-
     }
-  }, [tileSources]);
+  }, [tileSources, zoomLevel, xCoord, yCoord]);
 
-  // const onZoomPress = (zoomLevel, xCoord, yCoord) => {
+  const onZoomPress = (zoomLevel, xCoord, yCoord) => {
 
+    viewer.viewport.zoomTo(zoomLevelMain);
+    viewer.viewport.panTo(new OpenSeadragon.Point(xCoordMain, yCoordMain));
+    viewer.forceRedraw();
+
+  };
+
+  const updateFilterBrigtness = (filterObj) => {
+    setBrightness(filterObj.target.value);
+    viewer.canvas.style.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
+  };
+  const updateFilterContrast = (filterObj) => {
+    setContrast(filterObj.target.value);
+    viewer.canvas.style.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
+  };
+  const updateFilterGamma = (filterObj) => {
+    setGamma(filterObj.target.value);
+    viewer.canvas.style.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
+  };
+
+  //write a similart method for saturation
+  const updateFilterSaturation = (filterObj) => {
+    setSaturation(filterObj.target.value);
+    viewer.canvas.style.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
+  };
+
+  const resetFilters = function () {
+    setBrightness(100);
+    setContrast(100);
+    setGamma(1);
+    setSaturation(100);
+    viewer.canvas.style.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
   
+  };
 
-  // };
+
+
+
 
 
 
   return (
     <div>
       {/* <button onClick={() => onShowOSD(false)}>x</button> */}
-      <div
-        id="viewer"
-        ref={viewerRef}
-        style={{ width: "800px", height: "600px" }}
-      />
-      {/* <div>
-        <label>
-          Brightness
-          <input
-            type="range"
-            min="0"
-            max="200"
-            value={brightness}
-            onChange={updateFilterBrigtness}
-            tooltip="true"
-            class="form-range"
-            style={{ marginRight: "1rem", width: "5rem" }}
-          />
-        </label>
-        <label>
-          Contrast
-          <input
-            type="range"
-            min="0"
-            max="200"
-            value={contrast}
-            onChange={updateFilterContrast}
-            class="form-range"
-          />
-        </label>
-        <label>
-          Gamma
-          <input
-            type="range"
-            min="0"
-            max="2"
-            step="0.1"
-            value={gamma}
-            onChange={updateFilterGamma}
-            class="form-range"
-          />
-        </label>
-      </div> */}
+
+      <div style={{ display: "flex" }}>
+        <div
+          id="viewer"
+          ref={viewerRef}
+          style={{ width: "800px", height: "600px" }}
+        />
+
+
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            marginLeft: "0.8rem",
+          }}
+        >
+          <button className="btn btn-primary" onClick={resetFilters}>
+            Reset
+          </button>
+          <label>
+            Brightness
+            <input
+              type="range"
+              min="0"
+              max="200"
+              value={brightness}
+              onChange={updateFilterBrigtness}
+              tooltip="true"
+              class="form-range"
+            />
+          </label>
+          <label>
+            Contrast
+            <input
+              type="range"
+              min="0"
+              max="200"
+              value={contrast}
+              onChange={updateFilterContrast}
+              class="form-range"
+            />
+          </label>
+          <label>
+            Gamma
+            <input
+              type="range"
+              min="0"
+              max="5"
+              step="0.1"
+              value={gamma}
+              onChange={updateFilterGamma}
+              class="form-range"
+            />
+          </label>
+          <label>
+            Saturation
+            <input
+              type="range"
+              min="0"
+              max="200"
+              value={saturation}
+              onChange={updateFilterSaturation}
+              class="form-range"
+            />
+          </label>
+          <Row className="info-strip">
+            <Col>zoomLevel : {zoomLevelView}</Col>
+            <Col>viewport Height: {viewportHeight}</Col>
+            <Col>viewport Width: {viewportWidth}</Col>
+          </Row>
+          <button className="btn btn-primary" onClick={onZoomPress}>
+            Navigate to concerned part
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

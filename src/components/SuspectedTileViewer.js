@@ -229,20 +229,7 @@ const SuspectedTileViewer = ({
 
   return (
     <div className="container">
-      {/* <ToggleButtonGroup
-        type="radio"
-        name="options"
-        value={toggleValue}
-        onChange={handleChange}
-        style={{ marginLeft: "0.8rem", marginBottom: "1rem", width: "100%" }}
-      >
-        <ToggleButton id="toggle-check" value={"affected"}>
-          Affected Slides
-        </ToggleButton>
-        <ToggleButton id="toggle-check2" value={"adjust"}>
-          Adjust Slides
-        </ToggleButton>
-      </ToggleButtonGroup> */}
+
 
       <Modal show={show} onHide={handleClose} fullscreen={true}>
         <Modal.Header closeButton>
