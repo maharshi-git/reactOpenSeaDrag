@@ -5,7 +5,7 @@ import "@recogito/annotorious-openseadragon/dist/annotorious.min.css";
 import "openseadragon-filtering";
 import OpenSeadragonImagingHelper from "@openseadragon-imaging/openseadragon-imaginghelper";
 
-import { Row, Col, Button } from "react-bootstrap";
+import { Row, Col } from "react-bootstrap";
 
 const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord }) => {
   const viewerRef = useRef();
@@ -126,8 +126,12 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord }) => {
       });
 
 
-      // var viewer = OpenSeadragon({...});
-      var imagingHelper = viewer.activateImagingHelper({
+ 
+      // var imagingHelper = viewer.activateImagingHelper({
+      //   onImageViewChanged: onImageViewChanged,
+      // });
+ 
+      viewer.activateImagingHelper({
         onImageViewChanged: onImageViewChanged,
       });
 
@@ -142,7 +146,7 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord }) => {
       viewer.open(image);
 
       setViewer(viewer);
-      // setViewer2(viewer);
+    
 
     }
   }, [tileSources, zoomLevel, xCoord, yCoord]);
@@ -191,7 +195,7 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord }) => {
 
   return (
     <div>
-      {/* <button onClick={() => onShowOSD(false)}>x</button> */}
+
 
       <div style={{ display: "flex" }}>
         <div

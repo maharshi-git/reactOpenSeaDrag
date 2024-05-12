@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import DeepZoomViewer from "./DeepZoomViewer";
 
 import SuspectedTileViewer from "./SuspectedTileViewer";
-import OpenSeadragon from "openseadragon";
+
 
 import { Row, Col } from "react-bootstrap";
 
@@ -14,34 +14,9 @@ function DeepZoomMain() {
   const [zoomLevel, setZoomLevel] = useState();
   const [viewportHeight, setViewportHeight] = useState();
   const [viewportWidth, setViewportWidth] = useState();
-  const [viewrportcenter, setViewportCenter] = useState({ x: 0, y: 0 });
-  const [viewportOrigin, setViewportOrigin] = useState({ x: 0, y: 0 });
-
-  const [coordClick, setCoordClick] = useState({zoom:0, x:0, y:0});
 
   const [showOSD, setShowOSD] = useState(false);
 
-  // const onZoomPress = (zoomLevel, xCoord, yCoord) => {   
-    
-  //   if(viewer){
-
-  //     viewer.viewport.zoomTo(zoomLevel);
-  //     viewer.viewport.panTo(new OpenSeadragon.Point(xCoord, yCoord));
-  //     viewer.forceRedraw();      
-  //   }
-      
-    
-  // };
-
-  // const setViewAndZoom = (viewer, zoomLevel, xCoord, yCoord) => {
-
-  //   setViewer(viewer);
-
-  //   viewer.viewport.zoomTo(zoomLevel);
-  //   viewer.viewport.panTo(new OpenSeadragon.Point(xCoord, yCoord));
-  //   viewer.forceRedraw();    
-
-  // };
 
   const imgHelperValues = (obj) => {
     setZoomLevel(obj.zoomFactor.toFixed(2));
