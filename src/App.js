@@ -6,19 +6,24 @@ import "@recogito/annotorious-openseadragon/dist/annotorious.min.css";
 import SuspectedTileViewer from "./components/SuspectedTileViewer";
 import FileViewer from "./components/FileViewer";
 
+import ReactGallery from "./components/ReactGallery";
+import MindMapComponent from "./components/MindMapComponent";
+
 import "./App.css";
 
-import Toolbar from "./components/Toolbar";
+// import Toolbar from "./components/Toolbar";
 
 function App() {
   return (
 
-    <div> 
-      <Toolbar style={{ "margin-bottom": "1rem" }} />
-      <BrowserRouter>
+    <div style={{marginTop: "1rem"}}> 
+      {/* <Toolbar style={{ "margin-bottom": "1rem" }} /> */}
+      <BrowserRouter >
         <Routes>
           <Route path="/" element={<FileViewer />} />
           <Route path="/about" element={<SuspectedTileViewer />} />
+          <Route path="/gal" element={<ReactGallery />} />
+          <Route path="/mindMapComp" element={<MindMapComponent />} />
         </Routes>
       </BrowserRouter>
     </div>

@@ -1,13 +1,24 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
-import imagereport from "../resources/Roles 5.jpg";
+import imagereport from "../resources/test.jpg";
+import homeIcon from "../resources/icons/home (1).png";
+import gridIcon from "../resources/icons/menu.png";
 import { Modal } from 'react-bootstrap';
 import DeepZoomViewer from "./DeepZoomViewer";
-import Slider from '@mui/material/Slider';
+// import Slider from '@mui/material/Slider';
+import SlidingPane from "react-sliding-pane";
+import "react-sliding-pane/dist/react-sliding-pane.css";
+
+import SideNav, { Toggle, Nav, NavItem, NavIcon, NavText } from '@trendmicro/react-sidenav';
+
+// Be sure to include styles at some point, probably during your bootstraping
+import '@trendmicro/react-sidenav/dist/react-sidenav.css'
 
 
 const SuspectedTileViewer = () => {
   //api call to get coordinates of selected file from the server
+
+  const childRef = useRef();
 
   const [slidesClass, setSlidesClass] = useState("col-md-3");
   const [show, setShow] = useState(false);
@@ -18,6 +29,10 @@ const SuspectedTileViewer = () => {
 
   const [annotArr, setAnnotArr] = useState([]);
   const [data, setData] = useState(null);
+
+  const [showDragonView, setShowDragonView] = useState(false);
+
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -51,7 +66,7 @@ const SuspectedTileViewer = () => {
             id: id
 
           }
-          
+
           annotDetArr.push(annotObj);
         }
         setAnnotArr(annotDetArr);
@@ -64,7 +79,7 @@ const SuspectedTileViewer = () => {
     fetchData();
   }, []);
 
-  
+
 
   const images = [
     { src: imagereport, alt: "Image 1", zoom: 2, x: 0.5, y: 0.5 },
@@ -130,10 +145,11 @@ const SuspectedTileViewer = () => {
 
   const handleImageClick = (zoom, x, y) => {
     // loadAnnotation();loadAnnotation
+    setShowDragonView(true)
     setZoomLevel(zoom);
     setXCoord(x);
     setYCoord(y);
-    setShow(true);
+    // setShow(true);
   };
 
 
@@ -154,18 +170,19 @@ const SuspectedTileViewer = () => {
   }
 
 
-  const onChangeItemsPerPage = function (event) {
+  // const onChangeItemsPerPage = function (event) {
+  const onChangeItemsPerPage = function (inputVlue) {
     // return "test"
-    switch (event.target.value) {
-      case 4:
+    switch (inputVlue) {
+      case 1:
         setItemsPerPage(1);
         setSlidesClass("col-md-12");
         break;
-      case 8:
+      case 4:
         setItemsPerPage(4);
         setSlidesClass("col-md-6");
         break;
-      case 12:
+      case 9:
         setItemsPerPage(9);
         setSlidesClass("col-md-4");
         break;
@@ -174,6 +191,8 @@ const SuspectedTileViewer = () => {
         setSlidesClass("col-md-3");
         break;
       default:
+        setItemsPerPage(16);
+        setSlidesClass("col-md-3");
         break;
     }
     // setItemsPerPage(event.target.value);
@@ -210,7 +229,7 @@ const SuspectedTileViewer = () => {
           id: id
 
         }
-        
+
         annotDetArr.push(annotObj);
       }
       setAnnotArr(annotDetArr);
@@ -238,6 +257,48 @@ const SuspectedTileViewer = () => {
 
 
       <div style={{ display: "flex" }}>
+        <div>
+          <SideNav
+            onSelect={(selected) => {
+              // Add your code here
+            }}
+            style={{ background: "#1976d2" }}>
+            <SideNav.Toggle />
+            <SideNav.Nav defaultSelected="home">
+              <NavItem eventKey="home">
+                <NavIcon>
+                  {/* <i src={homeIcon} className="fa fa-fw fa-home" style={{ fontSize: '1.75em' }} /> */}
+                  <img src={homeIcon} style={{ fontSize: '1rem', width: "2rem", color: "white" }} />
+                </NavIcon>
+                <NavText>
+                  Home
+                </NavText>
+              </NavItem>
+              <NavItem eventKey="changeDimension">
+                <NavIcon>
+                  {/* <i className="fa fa-fw fa-line-chart" style={{ fontSize: '1.75em' }} /> */}
+                  <img src={gridIcon} style={{ fontSize: '1rem', width: "2rem", color: "white" }} />
+                </NavIcon>
+                <NavText>
+                  Adjust Dimension
+                </NavText>
+                <NavItem eventKey="charts/linechart">
+                  <NavText>
+                    <button onClick={() => { onChangeItemsPerPage(1) }} className="btn btn-primary">1x1</button>
+                    <button onClick={() => { onChangeItemsPerPage(4) }} className="btn btn-primary">2x2</button>
+                    <button onClick={() => { onChangeItemsPerPage(9) }} className="btn btn-primary">3x3</button>
+                    <button onClick={() => { onChangeItemsPerPage(16) }} className="btn btn-primary">4x4</button>
+                  </NavText>
+                </NavItem>
+                <NavItem eventKey="charts/barchart">
+                  <NavText>
+                    Adjust image
+                  </NavText>
+                </NavItem>
+              </NavItem>
+            </SideNav.Nav>
+          </SideNav>
+        </div>
         <div
           className="container"
         >
@@ -258,7 +319,16 @@ const SuspectedTileViewer = () => {
                 </div>
               </div>
             ))}
-
+            {/* <div style={{
+              position: 'fixed',
+              bottom: 0,
+              right: 0,
+              width: '50%',
+              height: '80%',
+              backgroundColor: '#f0f0f0', // Change this to the desired background color
+            }}>
+              <DeepZoomViewer zoomLevel={zoomLevel} xCoord={xCoord} yCoord={yCoord} annotDetArr={annotArr}></DeepZoomViewer>
+            </div> */}
           </div>
           <nav>
             <div style={{ overflow: "auto" }}>
@@ -295,25 +365,19 @@ const SuspectedTileViewer = () => {
             </div>
           </nav>
         </div>
-        <div >
-          <Slider
-            sx={{
-              '& input[type="range"]': {
-                WebkitAppearance: 'slider-vertical',
-              },
-            }}
-            orientation="vertical"
-            defaultValue={itemsPerPage}
-            aria-label="Temperature"
-            valueLabelDisplay="auto"
-            max={16}
-            min={4}
-            step={4}
-            onChange={onChangeItemsPerPage}
-            style={{ height: "80vh" }}
-
-          />
-        </div>
+        <SlidingPane
+          className="some-custom-class"
+          overlayClassName="some-custom-overlay-class"
+          isOpen={showDragonView}
+          title="Hey, it is optional pane title.  I can be React component too."
+          subtitle="Optional subtitle."
+          onRequestClose={() => {
+            // triggered on "<" on left top click or on outside click
+            setShowDragonView(false);
+          }}
+        >
+           <DeepZoomViewer ref={childRef} zoomLevel={zoomLevel} xCoord={xCoord} yCoord={yCoord} annotDetArr={annotArr}></DeepZoomViewer>
+        </SlidingPane>
       </div>
 
     </div>

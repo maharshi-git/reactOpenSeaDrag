@@ -17,9 +17,9 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr })
   const [viewportHeight, setViewportHeight] = useState();
   const [viewportWidth, setViewportWidth] = useState();
 
-  const [zoomLevelMain, setZoomLevelMain] = useState();
-  const [xCoordMain, setXCoordMain] = useState();
-  const [yCoordMain, setYCoordMain] = useState();
+  const [zoomLevelMain, setZoomLevelMain] = useState(zoomLevel);
+  const [xCoordMain, setXCoordMain] = useState(xCoord);
+  const [yCoordMain, setYCoordMain] = useState(yCoord);
 
 
   const [gamma, setGamma] = useState(1);
@@ -32,125 +32,128 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr })
 
   useEffect(() => {
 
-    setZoomLevelMain(zoomLevel);
-    setXCoordMain(xCoord);
-    setYCoordMain(yCoord);
+   
+    const viewer = OpenSeadragon({
+      id: "viewer",
+      prefixUrl:
+        "https://cdn.jsdelivr.net/npm/openseadragon@4.1/build/openseadragon/images/",
+      //   tileSources: tileSources,
+      animationTime: 0.5,
+      blendTime: 0.1,
+      constrainDuringPan: true,
+      maxZoomPixelRatio: 2,
+      minZoomImageRatio: 1,
+      visibilityRatio: 1,
+      zoomPerScroll: 2,
+      maxZoomLevel: 8,
+      minZoomLevel: 1,
+      ajaxWithCredentials: false, // Add this line
+      crossOriginPolicy: "Anonymous", // And this line
+      // toolbar:       "toolbarDiv"      
+    });
 
-    if (!viewer) {
-      const viewer = OpenSeadragon({
-        id: "viewer",
-        prefixUrl:
-          "https://cdn.jsdelivr.net/npm/openseadragon@4.1/build/openseadragon/images/",
-        //   tileSources: tileSources,
-        animationTime: 0.5,
-        blendTime: 0.1,
-        constrainDuringPan: true,
-        maxZoomPixelRatio: 2,
-        minZoomImageRatio: 1,
-        visibilityRatio: 1,
-        zoomPerScroll: 2,
-        maxZoomLevel: 8,
-        minZoomLevel: 1,
-        ajaxWithCredentials: false, // Add this line
-        crossOriginPolicy: "Anonymous", // And this line
-        // toolbar:       "toolbarDiv"      
-      });
+    viewer.addHandler("open", function () {
+      
+        viewer.viewport.zoomTo(zoomLevel);
+        viewer.viewport.panTo(new OpenSeadragon.Point(xCoord, yCoord));
+        viewer.forceRedraw();
+ 
+    });
 
-      viewer.addHandler("open", function () {
-        var getTileUrl = viewer.source.getTileUrl;
+    viewer.addHandler("open", function () {
+      var getTileUrl = viewer.source.getTileUrl;
 
-        viewer.source.getTileUrl = function () {
-          return getTileUrl.apply(this, arguments) + "?v=" + "261d9b83";
-        };
-      });
-
-      let image = {
-        Image: {
-          Format: "jpeg",
-          Overlap: 1,
-          Size: { Height: 38144, Width: 51200 },
-          TileSize: 510,
-          Url: "https://openslide-demo.s3.dualstack.us-east-1.amazonaws.com/hamamatsu/cmu-1/slide_files/",
-          xmlns: "http://schemas.microsoft.com/deepzoom/2008",
-        },
-        crossOriginPolicy: false,
-        ajaxWithCredentials: false,
-        useCanvas: true,
+      viewer.source.getTileUrl = function () {
+        return getTileUrl.apply(this, arguments) + "?v=" + "261d9b83";
       };
-      // let image = {"Image":{"Format":"jpeg","Overlap":1,"Size":{"Height":38144,"Width":51200},"TileSize":510,"Url":"http://127.0.0.1:5000/tile/","xmlns":"http://schemas.microsoft.com/deepzoom/2008"},"crossOriginPolicy":false,"ajaxWithCredentials":false,"useCanvas":true}
+    });
 
-      const anno = Annotorious(viewer, {});
+    // let image = {
+    //   Image: {
+    //     Format: "jpeg",
+    //     Overlap: 1,
+    //     Size: { Height: 38144, Width: 51200 },
+    //     TileSize: 510,
+    //     Url: "https://openslide-demo.s3.dualstack.us-east-1.amazonaws.com/hamamatsu/cmu-1/slide_files/",
+    //     xmlns: "http://schemas.microsoft.com/deepzoom/2008",
+    //   },
+    //   crossOriginPolicy: false,
+    //   ajaxWithCredentials: false,
+    //   useCanvas: true,
+    // };
+    let image = {"Image":{"Format":"jpeg","Overlap":1,"Size":{"Height":38144,"Width":51200},"TileSize":510,"Url":"http://127.0.0.1:5000/tile/","xmlns":"http://schemas.microsoft.com/deepzoom/2008"},"crossOriginPolicy":false,"ajaxWithCredentials":false,"useCanvas":true}
+    // let image = {"Image":{"Format":"jpeg","Overlap":1,"Size":{"Height":596,"Width":800},"TileSize":510,"Url":"http://127.0.0.1:5000/tile/","xmlns":"http://schemas.microsoft.com/deepzoom/2008"},"crossOriginPolicy":false,"ajaxWithCredentials":false,"useCanvas":true}
 
-      anno.on('deleteAnnotation', async (annotation) => {
-        // console.log(annotation);
-        anno.removeAnnotation(annotation.id);
-        await onFetchData('http://127.0.0.1:5000/deleteAnnotation', 'POST', {id: annotation.id})
-      });
+    const anno = Annotorious(viewer, {});
 
-      anno.on("createAnnotation", async function (annotation) {
-        console.log(annotation);
-        await onFetchData('http://127.0.0.1:5000/getAnnotation', 'POST', annotation)
+    anno.on('deleteAnnotation', async (annotation) => {
+      // console.log(annotation);
+      anno.removeAnnotation(annotation.id);
+      await onFetchData('http://127.0.0.1:5000/deleteAnnotation', 'POST', { id: annotation.id })
+    });
 
-      });
+    anno.on("createAnnotation", async function (annotation) {
+      console.log(annotation);
+      await onFetchData('http://127.0.0.1:5000/getAnnotation', 'POST', annotation)
 
-      for (var i in annotDetArr) {       
+    });
 
-        anno.addAnnotation({
-          "@context": "http://www.w3.org/ns/anno.jsonld",
-          id: annotDetArr[i].id,
-          type: "Annotation",
-          body: {
-            type: "TextualBody",
-            value: "This is a default annotation",
-            format: "text/plain",
+    for (var i in annotDetArr) {
+
+      anno.addAnnotation({
+        "@context": "http://www.w3.org/ns/anno.jsonld",
+        id: annotDetArr[i].id,
+        type: "Annotation",
+        body: {
+          type: "TextualBody",
+          value: "This is a default annotation",
+          format: "text/plain",
+        },
+        target: {
+          source: "http://example.com/image.jpg", // Replace with your image URL
+          selector: {
+            type: "FragmentSelector",
+            conformsTo: "http://www.w3.org/TR/media-frags/",
+            // value: "xywh=pixel:5000,5000,4000,4000", // Replace with your annotation coordinates
+            value: annotDetArr[i].xywh, // Replace with your annotation coordinates
           },
-          target: {
-            source: "http://example.com/image.jpg", // Replace with your image URL
-            selector: {
-              type: "FragmentSelector",
-              conformsTo: "http://www.w3.org/TR/media-frags/",
-              // value: "xywh=pixel:5000,5000,4000,4000", // Replace with your annotation coordinates
-              value: annotDetArr[i].xywh, // Replace with your annotation coordinates
-            },
-          },
-        });
-      }
-
-
-      viewer.addOverlay({
-        id: "example-overlay",
-        x: 0.33,
-        y: 0.75,
-        width: 0.2,
-        height: 0.25,
-        className: "highlight",
+        },
       });
+    }
+
+
+    viewer.addOverlay({
+      id: "example-overlay",
+      x: 0.33,
+      y: 0.75,
+      width: 0.2,
+      height: 0.25,
+      className: "highlight",
+    });
 
 
 
-      // var imagingHelper = viewer.activateImagingHelper({
-      //   onImageViewChanged: onImageViewChanged,
-      // });
+    // var imagingHelper = viewer.activateImagingHelper({
+    //   onImageViewChanged: onImageViewChanged,
+    // });
 
-      viewer.activateImagingHelper({
-        onImageViewChanged: onImageViewChanged,
-      });
+    viewer.activateImagingHelper({
+      onImageViewChanged: onImageViewChanged,
+    });
 
-      function onImageViewChanged(event) {
+    function onImageViewChanged(event) {
 
-        setZoomLevelView(event.zoomFactor.toFixed(2));
-        setViewportHeight(event.viewportWidth.toFixed(2));
-        setViewportWidth(event.viewportHeight.toFixed(2));
-
-      }
-
-      viewer.open(image);
-
-      setViewer(viewer);
-
+      setZoomLevelView(event.zoomFactor.toFixed(2));
+      setViewportHeight(event.viewportWidth.toFixed(2));
+      setViewportWidth(event.viewportHeight.toFixed(2));
 
     }
-  }, [tileSources, zoomLevel, xCoord, yCoord]);
+
+    viewer.open(image);
+
+    setViewer(viewer);
+
+  }, [tileSources]);
 
   const getSavedAnnotation = async () => {
     let savedData = await onFetchData('http://127.0.0.1:5000/getSavedAnnotation', 'GET',)
@@ -184,15 +187,6 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr })
 
     })
   }
-
-
-  const onZoomPress = (zoomLevel, xCoord, yCoord) => {
-
-    viewer.viewport.zoomTo(zoomLevelMain);
-    viewer.viewport.panTo(new OpenSeadragon.Point(xCoordMain, yCoordMain));
-    viewer.forceRedraw();
-
-  };
 
   const updateFilterBrigtness = (filterObj) => {
     setBrightness(filterObj.target.value);
@@ -240,7 +234,7 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr })
         />
 
 
-        <div
+        {/* <div
           style={{
             display: "flex",
             flexDirection: "column",
@@ -304,7 +298,7 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr })
           <button className="btn btn-primary" onClick={onZoomPress}>
             Navigate to concerned part
           </button>
-        </div>
+        </div> */}
       </div>
     </div>
   );
