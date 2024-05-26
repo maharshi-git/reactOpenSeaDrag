@@ -9,10 +9,14 @@ import DeepZoomViewer from "./DeepZoomViewer";
 import SlidingPane from "react-sliding-pane";
 import "react-sliding-pane/dist/react-sliding-pane.css";
 
+import Draggable from 'react-draggable';
+
+
 import SideNav, { Toggle, Nav, NavItem, NavIcon, NavText } from '@trendmicro/react-sidenav';
 
 // Be sure to include styles at some point, probably during your bootstraping
 import '@trendmicro/react-sidenav/dist/react-sidenav.css'
+import zIndex from "@mui/material/styles/zIndex";
 
 
 const SuspectedTileViewer = () => {
@@ -28,9 +32,11 @@ const SuspectedTileViewer = () => {
   const [yCoord, setYCoord] = useState();
 
   const [annotArr, setAnnotArr] = useState([]);
+  const [annotArrNDPI, setAnnotArrNDPI] = useState([]);
   const [data, setData] = useState(null);
 
   const [showDragonView, setShowDragonView] = useState(false);
+  const [selectedAnnotaiton, setSelectedAnnotation] = useState(null);
 
 
 
@@ -76,16 +82,45 @@ const SuspectedTileViewer = () => {
       }
     };
 
+    const fetchDataAnnotation = async () => {
+      const path = 'http://localhost:5000/tileSlide'; // Replace with your API path
+      const method = 'GET'; // Replace with your method
+      const body = {}; // Replace with your body
+
+      try {
+        const response = await fetch(path, {
+          method: method,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const annotDet = await response.json();
+        // setData(data);
+
+        console.log(annotDet);
+        setAnnotArrNDPI(annotDet.annotations.ndpviewstate);
+
+      } catch (error) {
+        console.error('There was a problem with the fetch operation: ', error);
+      }
+    }
+
     fetchData();
+    fetchDataAnnotation();
   }, []);
 
-
-
-  const images = [
-    { src: imagereport, alt: "Image 1", zoom: 2, x: 0.5, y: 0.5 },
-    { src: imagereport, alt: "Image 2", zoom: 6, x: 0.7, y: 0.2 },
-    { src: imagereport, alt: "Image 3", zoom: 4, x: 0.3, y: 0.4 },
-    { src: imagereport, alt: "Image 4", zoom: 8, x: 0.5, y: 0.5 },
+  let images = []
+if(annotArrNDPI.length > 0){
+  images = [
+    { src: `http://localhost:5000/get-image/${annotArrNDPI[0]['@id']}`, alt: "Image 1", zoom: 2, x: 0.5, y: 0.5, annotation: 'somethig is not right' },
+    { src: imagereport, alt: "Image 2", zoom: 6, x: 0.7, y: 0.2, annotation: 'somethig is surely not right' },
+    { src: imagereport, alt: "Image 3", zoom: 4, x: 0.3, y: 0.4, annotation: 'Horrible stuff' },
+    { src: imagereport, alt: "Image 4", zoom:128, x: 0.5, y: 0.5 },
     { src: imagereport, alt: "Image 5", zoom: 2, x: 0.5, y: 0.5 },
     { src: imagereport, alt: "Image 6", zoom: 2, x: 0.5, y: 0.5 },
     { src: imagereport, alt: "Image 1", zoom: 2, x: 0.5, y: 0.5 },
@@ -128,6 +163,7 @@ const SuspectedTileViewer = () => {
     { src: imagereport, alt: "Image 4" },
     { src: imagereport, alt: "Image 5" },
   ];
+}
 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(16);
@@ -143,8 +179,9 @@ const SuspectedTileViewer = () => {
 
 
 
-  const handleImageClick = (zoom, x, y) => {
+  const handleImageClick = (zoom, x, y, annotation) => {
     // loadAnnotation();loadAnnotation
+    setSelectedAnnotation(annotation)
     setShowDragonView(true)
     setZoomLevel(zoom);
     setXCoord(x);
@@ -243,7 +280,7 @@ const SuspectedTileViewer = () => {
     <div className="container">
 
 
-      <Modal show={show} onHide={handleClose} fullscreen={true}>
+      {/* <Modal show={show} onHide={handleClose} fullscreen={false} backdrop="static" keyboard={false}>
         <Modal.Header closeButton>
           <Modal.Title>OpenSeadragon Viewer</Modal.Title>
         </Modal.Header>
@@ -253,7 +290,13 @@ const SuspectedTileViewer = () => {
         <Modal.Footer>
 
         </Modal.Footer>
-      </Modal>
+      </Modal> */}
+
+      <Draggable >
+        <div className="dialogBox" style={{position: "absolute", top: "50%", zIndex:"1000", transform: "translate(-50%, -50%)"}}>
+          This dialog box can be dragged around.
+        </div>
+      </Draggable>
 
 
       <div style={{ display: "flex" }}>
@@ -308,7 +351,7 @@ const SuspectedTileViewer = () => {
                 <div className="card">
                   <button
                     style={{ border: "none", padding: 0, marginLeft: "-20px" }}
-                    onClick={() => handleImageClick(image.zoom, image.x, image.y)}
+                    onClick={() => handleImageClick(image.zoom, image.x, image.y, image.annotation)}
                   >
                     <img
                       src={image.src}
@@ -369,14 +412,15 @@ const SuspectedTileViewer = () => {
           className="some-custom-class"
           overlayClassName="some-custom-overlay-class"
           isOpen={showDragonView}
-          title="Hey, it is optional pane title.  I can be React component too."
-          subtitle="Optional subtitle."
+          
+          title={selectedAnnotaiton}
+          // subtitle="Optional subtitle."
           onRequestClose={() => {
             // triggered on "<" on left top click or on outside click
             setShowDragonView(false);
           }}
         >
-           <DeepZoomViewer ref={childRef} zoomLevel={zoomLevel} xCoord={xCoord} yCoord={yCoord} annotDetArr={annotArr}></DeepZoomViewer>
+          <DeepZoomViewer ref={childRef} zoomLevel={zoomLevel} xCoord={xCoord} yCoord={yCoord} annotDetArr={annotArr}></DeepZoomViewer>
         </SlidingPane>
       </div>
 

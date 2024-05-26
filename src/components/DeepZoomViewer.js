@@ -45,7 +45,7 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr })
       minZoomImageRatio: 1,
       visibilityRatio: 1,
       zoomPerScroll: 2,
-      maxZoomLevel: 8,
+      maxZoomLevel: 128,
       minZoomLevel: 1,
       ajaxWithCredentials: false, // Add this line
       crossOriginPolicy: "Anonymous", // And this line
@@ -81,7 +81,9 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr })
     //   ajaxWithCredentials: false,
     //   useCanvas: true,
     // };
-    let image = {"Image":{"Format":"jpeg","Overlap":1,"Size":{"Height":38144,"Width":51200},"TileSize":510,"Url":"http://127.0.0.1:5000/tile/","xmlns":"http://schemas.microsoft.com/deepzoom/2008"},"crossOriginPolicy":false,"ajaxWithCredentials":false,"useCanvas":true}
+    // let image = {"Image":{"Format":"jpeg","Overlap":1,"Size":{"Height":38144,"Width":51200},"TileSize":510,"Url":"http://127.0.0.1:5000/tile/","xmlns":"http://schemas.microsoft.com/deepzoom/2008"},"crossOriginPolicy":false,"ajaxWithCredentials":false,"useCanvas":true}
+    // let image = {"Image":{"Format":"jpeg","Overlap":1,"Size":{"Height":61440,"Width":60928},"TileSize":510,"Url":"http://127.0.0.1:5000/tile/","xmlns":"http://schemas.microsoft.com/deepzoom/2008"},"crossOriginPolicy":false,"ajaxWithCredentials":false,"useCanvas":true}
+    let image = {"Image":{"Format":"jpeg","Overlap":1,"Size":{"Height":61440,"Width":60928},"TileSize":510,"Url":"http://127.0.0.1:5000/tile/","xmlns":"http://schemas.microsoft.com/deepzoom/2008"},"crossOriginPolicy":false,"ajaxWithCredentials":false,"useCanvas":true}
     // let image = {"Image":{"Format":"jpeg","Overlap":1,"Size":{"Height":596,"Width":800},"TileSize":510,"Url":"http://127.0.0.1:5000/tile/","xmlns":"http://schemas.microsoft.com/deepzoom/2008"},"crossOriginPolicy":false,"ajaxWithCredentials":false,"useCanvas":true}
 
     const anno = Annotorious(viewer, {});
@@ -234,11 +236,12 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr })
         />
 
 
-        {/* <div
+        <div
           style={{
             display: "flex",
             flexDirection: "column",
             marginLeft: "0.8rem",
+            width: "200px",
           }}
         >
           <button className="btn btn-primary" onClick={resetFilters}>
@@ -295,10 +298,10 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr })
             <Col>viewport Height: {viewportHeight}</Col>
             <Col>viewport Width: {viewportWidth}</Col>
           </Row>
-          <button className="btn btn-primary" onClick={onZoomPress}>
+          {/* <button className="btn btn-primary" onClick={onZoomPress}>
             Navigate to concerned part
-          </button>
-        </div> */}
+          </button> */}
+        </div>
       </div>
     </div>
   );
