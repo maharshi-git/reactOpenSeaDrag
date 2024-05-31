@@ -148,6 +148,8 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr })
       setZoomLevelView(event.zoomFactor.toFixed(2));
       setViewportHeight(event.viewportWidth.toFixed(2));
       setViewportWidth(event.viewportHeight.toFixed(2));
+      setXCoordMain(event.viewportCenter.x);
+      setYCoordMain(event.viewportCenter.y);
 
     }
 
@@ -297,6 +299,8 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr })
             <Col>zoomLevel : {zoomLevelView}</Col>
             <Col>viewport Height: {viewportHeight}</Col>
             <Col>viewport Width: {viewportWidth}</Col>
+            <Col>xCoord: {xCoordMain}</Col>
+            <Col>yCoord: {yCoordMain}</Col>
           </Row>
           {/* <button className="btn btn-primary" onClick={onZoomPress}>
             Navigate to concerned part

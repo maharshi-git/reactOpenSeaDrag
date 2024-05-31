@@ -3,6 +3,8 @@ import React, { useState, useEffect, useRef } from "react";
 import imagereport from "../resources/test.jpg";
 import homeIcon from "../resources/icons/home (1).png";
 import gridIcon from "../resources/icons/menu.png";
+import nextIcon from "../resources/icons/next.png";
+import prevIcon from "../resources/icons/arrow.png";
 import { Modal } from 'react-bootstrap';
 import DeepZoomViewer from "./DeepZoomViewer";
 // import Slider from '@mui/material/Slider';
@@ -17,6 +19,19 @@ import SideNav, { Toggle, Nav, NavItem, NavIcon, NavText } from '@trendmicro/rea
 // Be sure to include styles at some point, probably during your bootstraping
 import '@trendmicro/react-sidenav/dist/react-sidenav.css'
 import zIndex from "@mui/material/styles/zIndex";
+
+import { styled } from '@mui/material/styles';
+import Box from '@mui/material/Box';
+import Paper from '@mui/material/Paper';
+import Grid from '@mui/material/Grid';
+
+const Item = styled(Paper)(({ theme }) => ({
+  backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
+  ...theme.typography.body2,
+  padding: theme.spacing(1),
+  textAlign: 'center',
+  color: theme.palette.text.secondary,
+}));
 
 
 const SuspectedTileViewer = () => {
@@ -38,6 +53,14 @@ const SuspectedTileViewer = () => {
   const [showDragonView, setShowDragonView] = useState(false);
   const [selectedAnnotaiton, setSelectedAnnotation] = useState(null);
 
+  const [images, setImages] = useState([])
+  const [gridWidth, setGridWidth] = useState('33%')
+  const [gridHeight, setGridHeight] = useState('33%')
+  const [gridX, setGridX] = useState(3)
+  const [gridY, setGridY] = useState(3)
+
+  // const [itemsPerPage, setItemsPerPage] = useState(16);
+  const [xsVal, setXsVal] = useState(3);
 
 
   useEffect(() => {
@@ -102,8 +125,24 @@ const SuspectedTileViewer = () => {
         const annotDet = await response.json();
         // setData(data);
 
+        let imagesArr = annotDet.Predicts.map(x => {
+          return {
+            src: `http://localhost:5000/get_image/${x.id}`,
+            alt: "Image 1",
+            zoom: 32,
+            x: x.openSeaXCoord,
+            y: x.openSeaYCoord,
+            annotation: 'somethig is not right'
+
+          }
+
+        })
+
+        setImages(imagesArr)
         console.log(annotDet);
-        setAnnotArrNDPI(annotDet.annotations.ndpviewstate);
+        setAnnotArrNDPI(annotDet.Predicts);
+
+
 
       } catch (error) {
         console.error('There was a problem with the fetch operation: ', error);
@@ -114,59 +153,8 @@ const SuspectedTileViewer = () => {
     fetchDataAnnotation();
   }, []);
 
-  let images = []
-if(annotArrNDPI.length > 0){
-  images = [
-    { src: `http://localhost:5000/get-image/${annotArrNDPI[0]['@id']}`, alt: "Image 1", zoom: 2, x: 0.5, y: 0.5, annotation: 'somethig is not right' },
-    { src: imagereport, alt: "Image 2", zoom: 6, x: 0.7, y: 0.2, annotation: 'somethig is surely not right' },
-    { src: imagereport, alt: "Image 3", zoom: 4, x: 0.3, y: 0.4, annotation: 'Horrible stuff' },
-    { src: imagereport, alt: "Image 4", zoom:128, x: 0.5, y: 0.5 },
-    { src: imagereport, alt: "Image 5", zoom: 2, x: 0.5, y: 0.5 },
-    { src: imagereport, alt: "Image 6", zoom: 2, x: 0.5, y: 0.5 },
-    { src: imagereport, alt: "Image 1", zoom: 2, x: 0.5, y: 0.5 },
-    { src: imagereport, alt: "Image 2", zoom: 2, x: 0.5, y: 0.5 },
-    { src: imagereport, alt: "Image 3", zoom: 2, x: 0.5, y: 0.5 },
-    { src: imagereport, alt: "Image 4", zoom: 2, x: 0.5, y: 0.5 },
-    { src: imagereport, alt: "Image 5" },
-    { src: imagereport, alt: "Image 1" },
-    { src: imagereport, alt: "Image 2" },
-    { src: imagereport, alt: "Image 3" },
-    { src: imagereport, alt: "Image 4" },
-    { src: imagereport, alt: "Image 5" },
-    { src: "", alt: "Image 6" },
-    { src: imagereport, alt: "Image 1" },
-    { src: imagereport, alt: "Image 2" },
-    { src: imagereport, alt: "Image 3" },
-    { src: imagereport, alt: "Image 4" },
-    { src: imagereport, alt: "Image 5" },
-
-    { src: imagereport, alt: "Image 1" },
-    { src: imagereport, alt: "Image 2" },
-    { src: imagereport, alt: "Image 3" },
-    { src: imagereport, alt: "Image 4" },
-    { src: imagereport, alt: "Image 5" },
-    { src: "", alt: "Image 6" },
-    { src: imagereport, alt: "Image 1" },
-    { src: imagereport, alt: "Image 2" },
-    { src: imagereport, alt: "Image 3" },
-    { src: imagereport, alt: "Image 4" },
-    { src: imagereport, alt: "Image 5" },
-    { src: imagereport, alt: "Image 1" },
-    { src: imagereport, alt: "Image 2" },
-    { src: imagereport, alt: "Image 3" },
-    { src: imagereport, alt: "Image 4" },
-    { src: imagereport, alt: "Image 5" },
-    { src: "", alt: "Image 6" },
-    { src: imagereport, alt: "Image 1" },
-    { src: imagereport, alt: "Image 2" },
-    { src: imagereport, alt: "Image 3" },
-    { src: imagereport, alt: "Image 4" },
-    { src: imagereport, alt: "Image 5" },
-  ];
-}
-
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(16);
+  const [itemsPerPage, setItemsPerPage] = useState(8);
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -235,6 +223,45 @@ if(annotArrNDPI.length > 0){
     // setItemsPerPage(event.target.value);
   }
 
+  const onChangeItemsPerPage2 = (param) =>{
+    switch (param) {
+      case 1:
+        setXsVal(8);
+        setItemsPerPage(1);
+        break;
+      case 2:
+        setXsVal(6);
+        setItemsPerPage(2);
+        break;
+      case 3:
+        setXsVal(4);
+        setItemsPerPage(3);
+        break;
+      case 4:
+        setXsVal(3);
+        setItemsPerPage(8);
+        
+        break;
+      case 6:
+        setXsVal(2);
+        setItemsPerPage(18);
+        
+        break;
+        case 7:
+          setXsVal(2);
+          setItemsPerPage(18);
+          
+          break;
+        setXsVal(2);
+        setItemsPerPage(1);
+      default:
+        setXsVal(3);
+        setItemsPerPage(1);
+        break;
+    }
+
+  }
+
   const fetchData = async () => {
     const path = 'http://localhost:5000/getSavedAnnotation'; // Replace with your API path
     const method = 'GET'; // Replace with your method
@@ -292,11 +319,11 @@ if(annotArrNDPI.length > 0){
         </Modal.Footer>
       </Modal> */}
 
-      <Draggable >
+      {/* <Draggable >
         <div className="dialogBox" style={{position: "absolute", top: "50%", zIndex:"1000", transform: "translate(-50%, -50%)"}}>
           This dialog box can be dragged around.
         </div>
-      </Draggable>
+      </Draggable> */}
 
 
       <div style={{ display: "flex" }}>
@@ -317,6 +344,7 @@ if(annotArrNDPI.length > 0){
                   Home
                 </NavText>
               </NavItem>
+              
               <NavItem eventKey="changeDimension">
                 <NavIcon>
                   {/* <i className="fa fa-fw fa-line-chart" style={{ fontSize: '1.75em' }} /> */}
@@ -327,92 +355,61 @@ if(annotArrNDPI.length > 0){
                 </NavText>
                 <NavItem eventKey="charts/linechart">
                   <NavText>
-                    <button onClick={() => { onChangeItemsPerPage(1) }} className="btn btn-primary">1x1</button>
-                    <button onClick={() => { onChangeItemsPerPage(4) }} className="btn btn-primary">2x2</button>
-                    <button onClick={() => { onChangeItemsPerPage(9) }} className="btn btn-primary">3x3</button>
-                    <button onClick={() => { onChangeItemsPerPage(16) }} className="btn btn-primary">4x4</button>
+                    {/* <button onClick={() => { onChangeItemsPerPage(1) }} className="btn btn-primary">1x1</button>
+                    <button onClick={() => { onChangeItemsPerPage(4) }} className="btn btn-primary">2x1</button>
+                    <button onClick={() => { onChangeItemsPerPage(9) }} className="btn btn-primary">3x1</button>
+                    <button onClick={() => { onChangeItemsPerPage(16) }} className="btn btn-primary">4x2</button>
+                    <button onClick={() => { onChangeItemsPerPage(16) }} className="btn btn-primary">6x3</button> */}
+                    <button onClick={() => { onChangeItemsPerPage2(1) }} className="btn btn-primary">1x1</button>
+                    <button onClick={() => { onChangeItemsPerPage2(2) }} className="btn btn-primary">2x1</button>
+                    <button onClick={() => { onChangeItemsPerPage2(3) }} className="btn btn-primary">3x1</button>
+                    <button onClick={() => { onChangeItemsPerPage2(4) }} className="btn btn-primary">4x2</button>
+                    <button onClick={() => { onChangeItemsPerPage2(6) }} className="btn btn-primary">6x3</button>
+                    {/* <button onClick={() => { onChangeItemsPerPage(16) }} className="btn btn-primary">4x2</button> */}
                   </NavText>
                 </NavItem>
-                <NavItem eventKey="charts/barchart">
-                  <NavText>
-                    Adjust image
-                  </NavText>
-                </NavItem>
+              
+              </NavItem>
+              <NavItem eventKey="nextPage" onClick={() => handlePageClick(currentPage + 1)}>
+                <NavIcon>
+                  {/* <i src={homeIcon} className="fa fa-fw fa-home" style={{ fontSize: '1.75em' }} /> */}
+                  <img src={nextIcon} style={{ fontSize: '1rem', width: "2rem", color: "white" }} />
+                </NavIcon>
+                <NavText>
+                  Next Page
+                </NavText>
+              </NavItem>
+              <NavItem eventKey="nextPage" onClick={() => handlePageClick(currentPage - 1)}>
+                <NavIcon>
+                  {/* <i src={homeIcon} className="fa fa-fw fa-home" style={{ fontSize: '1.75em' }} /> */}
+                  <img src={prevIcon} style={{ fontSize: '1rem', width: "2rem", color: "white" }} />
+                </NavIcon>
+                <NavText>
+                  Next Page
+                </NavText>
               </NavItem>
             </SideNav.Nav>
           </SideNav>
         </div>
-        <div
-          className="container"
-        >
-          <div className="row" >
-            {currentItems.map((image, index) => (
-              <div id="tileViewer" key={index} className={slidesClass}>
-                <div className="card">
-                  <button
-                    style={{ border: "none", padding: 0, marginLeft: "-20px" }}
-                    onClick={() => handleImageClick(image.zoom, image.x, image.y, image.annotation)}
-                  >
-                    <img
-                      src={image.src}
-                      alt={image.alt}
-                      className="card-img-top"
-                    />
+        <Grid container spacing={0} >
+          {
+            currentItems.map((image, index) => (
+              <Grid item xs={xsVal}>
+                <Item>
+                  <button style={{border: "none"}} onClick={() => handleImageClick(image.zoom, image.x, image.y, image.annotation)}>
+                    <img className="card-img-top" key={index} src={image.src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   </button>
-                </div>
-              </div>
-            ))}
-            {/* <div style={{
-              position: 'fixed',
-              bottom: 0,
-              right: 0,
-              width: '50%',
-              height: '80%',
-              backgroundColor: '#f0f0f0', // Change this to the desired background color
-            }}>
-              <DeepZoomViewer zoomLevel={zoomLevel} xCoord={xCoord} yCoord={yCoord} annotDetArr={annotArr}></DeepZoomViewer>
-            </div> */}
-          </div>
-          <nav>
-            <div style={{ overflow: "auto" }}>
-              <ul className="pagination">
-                <li className="page-item">
-                  <a
-                    onClick={() => handlePageClick(currentPage - 1)}
-                    className="page-link"
-                    disabled={currentPage === 1}
-                  >
-                    Previous
-                  </a>
-                </li>
-                {pageNumbers.map((number) => (
-                  <li key={number} className="page-item">
-                    <a
-                      onClick={() => handlePageClick(number)}
-                      className="page-link"
-                    >
-                      {number}
-                    </a>
-                  </li>
-                ))}
-                <li className="page-item">
-                  <a
-                    onClick={() => handlePageClick(currentPage + 1)}
-                    className="page-link"
-                    disabled={currentPage === pageNumbers.length}
-                  >
-                    Next
-                  </a>
-                </li>
-              </ul>
-            </div>
-          </nav>
-        </div>
+                </Item>
+              </Grid>
+            ))
+          }
+
+        </Grid>
         <SlidingPane
           className="some-custom-class"
           overlayClassName="some-custom-overlay-class"
           isOpen={showDragonView}
-          
+
           title={selectedAnnotaiton}
           // subtitle="Optional subtitle."
           onRequestClose={() => {
