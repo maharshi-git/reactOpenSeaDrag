@@ -5,6 +5,8 @@ import "@recogito/annotorious-openseadragon/dist/annotorious.min.css";
 import "openseadragon-filtering";
 import OpenSeadragonImagingHelper from "@openseadragon-imaging/openseadragon-imaginghelper";
 
+import './openseadragon-scalebar.js'
+
 import { Row, Col } from "react-bootstrap";
 
 const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr }) => {
@@ -51,7 +53,10 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr })
       crossOriginPolicy: "Anonymous", // And this line
       // toolbar:       "toolbarDiv"   
       showNavigator: true
+
     });
+
+
 
     // new OpenSeadragon.DraggableNavigator({
     //   viewer: viewer,
@@ -64,9 +69,25 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr })
       viewer.viewport.panTo(new OpenSeadragon.Point(xCoord, yCoord));
       viewer.forceRedraw();
 
+      viewer.scalebar({
+        type: OpenSeadragon.ScalebarType.MICROSCOPY,
+        pixelsPerMeter: 50000,
+        minWidth: "150px",
+        location: OpenSeadragon.ScalebarLocation.BOTTOM_RIGHT,
+        yOffset: 5,
+        stayInsideImage: false,
+        color: "rgb(150,150,150)",
+        fontColor: "rgb(100,100,100)",
+        backgroundColor: "rgba(255,255,255,0.5)",
+        fontSize: "small",
+        barThickness: 2
+      });
+
+
+
+
     });
 
-    // viewer.setNavigatorDraggable(true)
 
     viewer.addHandler("open", function () {
       var getTileUrl = viewer.source.getTileUrl;
@@ -75,30 +96,11 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr })
         return getTileUrl.apply(this, arguments) + "?v=" + "261d9b83";
       };
 
-      // viewer.setNavigatorDraggable(true);
     });
 
-    // let image = {
-    //   Image: {
-    //     Format: "jpeg",
-    //     Overlap: 1,
-    //     Size: { Height: 38144, Width: 51200 },
-    //     TileSize: 510,
-    //     Url: "https://openslide-demo.s3.dualstack.us-east-1.amazonaws.com/hamamatsu/cmu-1/slide_files/",
-    //     xmlns: "http://schemas.microsoft.com/deepzoom/2008",
-    //   },
-    //   crossOriginPolicy: false,
-    //   ajaxWithCredentials: false,
-    //   useCanvas: true,
-    // };
-    // let image = {"Image":{"Format":"jpeg","Overlap":1,"Size":{"Height":38144,"Width":51200},"TileSize":510,"Url":"http://127.0.0.1:5000/tile/","xmlns":"http://schemas.microsoft.com/deepzoom/2008"},"crossOriginPolicy":false,"ajaxWithCredentials":false,"useCanvas":true}
-    // let image = {"Image":{"Format":"jpeg","Overlap":1,"Size":{"Height":61440,"Width":60928},"TileSize":510,"Url":"http://127.0.0.1:5000/tile/","xmlns":"http://schemas.microsoft.com/deepzoom/2008"},"crossOriginPolicy":false,"ajaxWithCredentials":false,"useCanvas":true}
     let image = { "Image": { "Format": "jpeg", "Overlap": 1, "Size": { "Height": 61440, "Width": 60928 }, "TileSize": 510, "Url": "http://127.0.0.1:5000/tile/", "xmlns": "http://schemas.microsoft.com/deepzoom/2008" }, "crossOriginPolicy": false, "ajaxWithCredentials": false, "useCanvas": true }
-    // let image = {"Image":{"Format":"jpeg","Overlap":1,"Size":{"Height":596,"Width":800},"TileSize":510,"Url":"http://127.0.0.1:5000/tile/","xmlns":"http://schemas.microsoft.com/deepzoom/2008"},"crossOriginPolicy":false,"ajaxWithCredentials":false,"useCanvas":true}
 
     const anno = Annotorious(viewer, {});
-
-    // viewer.setNavigatorDraggable(true);
 
     anno.on('deleteAnnotation', async (annotation) => {
       // console.log(annotation);
@@ -120,7 +122,7 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr })
         type: "Annotation",
         body: {
           type: "TextualBody",
-          value: "This is a default annotation",
+          value: annotDetArr[i].title,
           format: "text/plain",
         },
         target: {
@@ -128,7 +130,6 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr })
           selector: {
             type: "FragmentSelector",
             conformsTo: "http://www.w3.org/TR/media-frags/",
-            // value: "xywh=pixel:5000,5000,4000,4000", // Replace with your annotation coordinates
             value: annotDetArr[i].xywh, // Replace with your annotation coordinates
           },
         },

@@ -64,46 +64,46 @@ const SuspectedTileViewer = () => {
 
 
   useEffect(() => {
-    const fetchData = async () => {
-      const path = 'http://localhost:5000/getSavedAnnotation'; // Replace with your API path
-      const method = 'GET'; // Replace with your method
-      const body = {}; // Replace with your body
+    // const fetchData = async () => {
+    //   const path = 'http://localhost:5000/getSavedAnnotation'; // Replace with your API path
+    //   const method = 'GET'; // Replace with your method
+    //   const body = {}; // Replace with your body
 
-      try {
-        const response = await fetch(path, {
-          method: method,
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        });
+    //   try {
+    //     const response = await fetch(path, {
+    //       method: method,
+    //       headers: {
+    //         'Content-Type': 'application/json'
+    //       }
+    //     });
 
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
+    //     if (!response.ok) {
+    //       throw new Error(`HTTP error! status: ${response.status}`);
+    //     }
 
-        const annotDet = await response.json();
-        // setData(data);
+    //     const annotDet = await response.json();
+    //     // setData(data);
 
 
-        let annotDetArr = []
-        let xywh, id
-        for (var i = 0; i < annotDet.length; i++) {
-          xywh = `xywh=pixel:${annotDet[i].coordinates.x},${annotDet[i].coordinates.y},${annotDet[i].coordinates.width},${annotDet[i].coordinates.height}`
-          id = annotDet[i].id
-          let annotObj = {
-            xywh: xywh,
-            id: id
+    //     let annotDetArr = []
+    //     let xywh, id
+    //     for (var i = 0; i < annotDet.length; i++) {
+    //       xywh = `xywh=pixel:${annotDet[i].coordinates.x},${annotDet[i].coordinates.y},${annotDet[i].coordinates.width},${annotDet[i].coordinates.height}`
+    //       id = annotDet[i].id
+    //       let annotObj = {
+    //         xywh: xywh,
+    //         id: id
 
-          }
+    //       }
 
-          annotDetArr.push(annotObj);
-        }
-        setAnnotArr(annotDetArr);
+    //       annotDetArr.push(annotObj);
+    //     }
+    //     setAnnotArr(annotDetArr);
 
-      } catch (error) {
-        console.error('There was a problem with the fetch operation: ', error);
-      }
-    };
+    //   } catch (error) {
+    //     console.error('There was a problem with the fetch operation: ', error);
+    //   }
+    // };
 
     const fetchDataAnnotation = async () => {
       const path = 'http://localhost:5000/tileSlide'; // Replace with your API path
@@ -128,8 +128,8 @@ const SuspectedTileViewer = () => {
         let imagesArr = annotDet.Predicts.map(x => {
           return {
             src: `http://localhost:5000/get_image/${x.id}`,
-            alt: x.id,
-            zoom: 32,
+            alt: x.title,
+            zoom: 64,
             x: x.openSeaXCoord,
             y: x.openSeaYCoord,
             annotation: 'somethig is not right'
@@ -137,6 +137,31 @@ const SuspectedTileViewer = () => {
           }
 
         })
+
+
+        let annotDetArr = annotDet.Predicts.map(x => {
+          return {
+            xywh: `xywh=pixel:${x.x1},${x.y1},${x.x2 - x.x1},${x.y2 - x.y1}`,
+            id: x.id,
+            title: x.title
+          }
+        })
+        // let annotDetArr = []
+
+
+        // let xywh, id
+        // for (var i = 0; i < annotDet.Predicts.length; i++) {
+        //   xywh = `xywh=pixel:${annotDet[i].coordinates.x},${annotDet[i].coordinates.y},${annotDet[i].coordinates.width},${annotDet[i].coordinates.height}`
+        //   id = annotDet[i].id
+        //   let annotObj = {
+        //     xywh: xywh,
+        //     id: id
+
+        //   }
+
+        //   annotDetArr.push(annotObj);
+        // }
+        setAnnotArr(annotDetArr);
 
         setImages(imagesArr)
         console.log(annotDet);
@@ -149,7 +174,7 @@ const SuspectedTileViewer = () => {
       }
     }
 
-    fetchData();
+    // fetchData();
     fetchDataAnnotation();
   }, []);
 
@@ -223,7 +248,7 @@ const SuspectedTileViewer = () => {
     // setItemsPerPage(event.target.value);
   }
 
-  const onChangeItemsPerPage2 = (param) =>{
+  const onChangeItemsPerPage2 = (param) => {
     switch (param) {
       case 1:
         setXsVal(8);
@@ -240,18 +265,18 @@ const SuspectedTileViewer = () => {
       case 4:
         setXsVal(3);
         setItemsPerPage(8);
-        
+
         break;
       case 6:
         setXsVal(2);
         setItemsPerPage(18);
-        
+
         break;
-        case 7:
-          setXsVal(2);
-          setItemsPerPage(18);
-          
-          break;
+      case 7:
+        setXsVal(2);
+        setItemsPerPage(18);
+
+        break;
         setXsVal(2);
         setItemsPerPage(1);
       default:
@@ -344,7 +369,7 @@ const SuspectedTileViewer = () => {
                   Home
                 </NavText>
               </NavItem>
-              
+
               <NavItem eventKey="changeDimension">
                 <NavIcon>
                   {/* <i className="fa fa-fw fa-line-chart" style={{ fontSize: '1.75em' }} /> */}
@@ -368,7 +393,7 @@ const SuspectedTileViewer = () => {
                     {/* <button onClick={() => { onChangeItemsPerPage(16) }} className="btn btn-primary">4x2</button> */}
                   </NavText>
                 </NavItem>
-              
+
               </NavItem>
               <NavItem eventKey="nextPage" onClick={() => handlePageClick(currentPage + 1)}>
                 <NavIcon>
@@ -388,11 +413,20 @@ const SuspectedTileViewer = () => {
                   Previous Page
                 </NavText>
               </NavItem>
-              <NavItem eventKey="nextPage" onClick={() => handlePageClick(currentPage - 1)}>
+
+
+              <NavItem eventKey="changeDimension">
                 
-                <NavText style={{marginLeft: "0.5rem"}}>
-                  Page: {currentPage}
+                <NavText style={{ marginLeft: "0.7rem" }}>
+                {currentPage}/{Math.ceil(images.length / itemsPerPage)}
                 </NavText>
+                <NavItem eventKey="charts/linechart">
+                  <NavText>
+                  <input  onKeyDown={(event) => {
+                      setCurrentPage(event.target.value)
+                    }} style={{height: "1rem"}}></input>
+                  </NavText>
+                </NavItem>
               </NavItem>
             </SideNav.Nav>
           </SideNav>
@@ -402,12 +436,12 @@ const SuspectedTileViewer = () => {
             currentItems.map((image, index) => (
               <Grid item xs={xsVal}>
                 <Item>
-                  <button style={{border: "none"}} onClick={() => handleImageClick(image.zoom, image.x, image.y, image.annotation)}>
+                  <button style={{ border: "none" }} onClick={() => handleImageClick(image.zoom, image.x, image.y, image.annotation)}>
                     <p>{image.alt}</p>
                     <img className="card-img-top" key={index} src={image.src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   </button>
                 </Item>
-              </Grid> 
+              </Grid>
             ))
           }
 
