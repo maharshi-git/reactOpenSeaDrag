@@ -32,7 +32,7 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr })
 
   useEffect(() => {
 
-   
+
     const viewer = OpenSeadragon({
       id: "viewer",
       prefixUrl:
@@ -49,16 +49,24 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr })
       minZoomLevel: 1,
       ajaxWithCredentials: false, // Add this line
       crossOriginPolicy: "Anonymous", // And this line
-      // toolbar:       "toolbarDiv"      
+      // toolbar:       "toolbarDiv"   
+      showNavigator: true
     });
 
+    // new OpenSeadragon.DraggableNavigator({
+    //   viewer: viewer,
+    // });
+    // viewer.setNavigatorDraggable(true);
+
     viewer.addHandler("open", function () {
-      
-        viewer.viewport.zoomTo(zoomLevel);
-        viewer.viewport.panTo(new OpenSeadragon.Point(xCoord, yCoord));
-        viewer.forceRedraw();
- 
+
+      viewer.viewport.zoomTo(zoomLevel);
+      viewer.viewport.panTo(new OpenSeadragon.Point(xCoord, yCoord));
+      viewer.forceRedraw();
+
     });
+
+    // viewer.setNavigatorDraggable(true)
 
     viewer.addHandler("open", function () {
       var getTileUrl = viewer.source.getTileUrl;
@@ -66,6 +74,8 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr })
       viewer.source.getTileUrl = function () {
         return getTileUrl.apply(this, arguments) + "?v=" + "261d9b83";
       };
+
+      // viewer.setNavigatorDraggable(true);
     });
 
     // let image = {
@@ -83,10 +93,12 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr })
     // };
     // let image = {"Image":{"Format":"jpeg","Overlap":1,"Size":{"Height":38144,"Width":51200},"TileSize":510,"Url":"http://127.0.0.1:5000/tile/","xmlns":"http://schemas.microsoft.com/deepzoom/2008"},"crossOriginPolicy":false,"ajaxWithCredentials":false,"useCanvas":true}
     // let image = {"Image":{"Format":"jpeg","Overlap":1,"Size":{"Height":61440,"Width":60928},"TileSize":510,"Url":"http://127.0.0.1:5000/tile/","xmlns":"http://schemas.microsoft.com/deepzoom/2008"},"crossOriginPolicy":false,"ajaxWithCredentials":false,"useCanvas":true}
-    let image = {"Image":{"Format":"jpeg","Overlap":1,"Size":{"Height":61440,"Width":60928},"TileSize":510,"Url":"http://127.0.0.1:5000/tile/","xmlns":"http://schemas.microsoft.com/deepzoom/2008"},"crossOriginPolicy":false,"ajaxWithCredentials":false,"useCanvas":true}
+    let image = { "Image": { "Format": "jpeg", "Overlap": 1, "Size": { "Height": 61440, "Width": 60928 }, "TileSize": 510, "Url": "http://127.0.0.1:5000/tile/", "xmlns": "http://schemas.microsoft.com/deepzoom/2008" }, "crossOriginPolicy": false, "ajaxWithCredentials": false, "useCanvas": true }
     // let image = {"Image":{"Format":"jpeg","Overlap":1,"Size":{"Height":596,"Width":800},"TileSize":510,"Url":"http://127.0.0.1:5000/tile/","xmlns":"http://schemas.microsoft.com/deepzoom/2008"},"crossOriginPolicy":false,"ajaxWithCredentials":false,"useCanvas":true}
 
     const anno = Annotorious(viewer, {});
+
+    // viewer.setNavigatorDraggable(true);
 
     anno.on('deleteAnnotation', async (annotation) => {
       // console.log(annotation);

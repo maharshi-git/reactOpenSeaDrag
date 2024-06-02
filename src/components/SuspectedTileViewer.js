@@ -128,7 +128,7 @@ const SuspectedTileViewer = () => {
         let imagesArr = annotDet.Predicts.map(x => {
           return {
             src: `http://localhost:5000/get_image/${x.id}`,
-            alt: "Image 1",
+            alt: x.id,
             zoom: 32,
             x: x.openSeaXCoord,
             y: x.openSeaYCoord,
@@ -385,7 +385,13 @@ const SuspectedTileViewer = () => {
                   <img src={prevIcon} style={{ fontSize: '1rem', width: "2rem", color: "white" }} />
                 </NavIcon>
                 <NavText>
-                  Next Page
+                  Previous Page
+                </NavText>
+              </NavItem>
+              <NavItem eventKey="nextPage" onClick={() => handlePageClick(currentPage - 1)}>
+                
+                <NavText style={{marginLeft: "0.5rem"}}>
+                  Page: {currentPage}
                 </NavText>
               </NavItem>
             </SideNav.Nav>
@@ -397,10 +403,11 @@ const SuspectedTileViewer = () => {
               <Grid item xs={xsVal}>
                 <Item>
                   <button style={{border: "none"}} onClick={() => handleImageClick(image.zoom, image.x, image.y, image.annotation)}>
+                    <p>{image.alt}</p>
                     <img className="card-img-top" key={index} src={image.src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   </button>
                 </Item>
-              </Grid>
+              </Grid> 
             ))
           }
 
