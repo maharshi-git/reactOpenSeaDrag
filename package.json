@@ -8,6 +8,7 @@
     "@mui/material": "^5.15.17",
     "@openseadragon-imaging/openseadragon-imaginghelper": "^2.2.2",
     "@recogito/annotorious-openseadragon": "^2.7.17",
+    "@recogito/annotorious-shape-labels": "^0.2.3",
     "@samvera/clover-iiif": "^2.3.2",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",

@@ -54,10 +54,7 @@ const SuspectedTileViewer = () => {
   const [selectedAnnotaiton, setSelectedAnnotation] = useState(null);
 
   const [images, setImages] = useState([])
-  const [gridWidth, setGridWidth] = useState('33%')
-  const [gridHeight, setGridHeight] = useState('33%')
-  const [gridX, setGridX] = useState(3)
-  const [gridY, setGridY] = useState(3)
+
 
   // const [itemsPerPage, setItemsPerPage] = useState(16);
   const [xsVal, setXsVal] = useState(3);
@@ -132,7 +129,7 @@ const SuspectedTileViewer = () => {
             zoom: 64,
             x: x.openSeaXCoord,
             y: x.openSeaYCoord,
-            annotation: 'somethig is not right'
+            annotation: x.title
 
           }
 

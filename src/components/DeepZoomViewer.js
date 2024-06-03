@@ -4,6 +4,7 @@ import * as Annotorious from "@recogito/annotorious-openseadragon";
 import "@recogito/annotorious-openseadragon/dist/annotorious.min.css";
 import "openseadragon-filtering";
 import OpenSeadragonImagingHelper from "@openseadragon-imaging/openseadragon-imaginghelper";
+import ShapeLabelsFormatter from "@recogito/annotorious-shape-labels";
 
 import './openseadragon-scalebar.js'
 
@@ -82,10 +83,6 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr })
         fontSize: "small",
         barThickness: 2
       });
-
-
-
-
     });
 
 
@@ -100,7 +97,13 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr })
 
     let image = { "Image": { "Format": "jpeg", "Overlap": 1, "Size": { "Height": 61440, "Width": 60928 }, "TileSize": 510, "Url": "http://127.0.0.1:5000/tile/", "xmlns": "http://schemas.microsoft.com/deepzoom/2008" }, "crossOriginPolicy": false, "ajaxWithCredentials": false, "useCanvas": true }
 
-    const anno = Annotorious(viewer, {});
+
+    const anno = Annotorious(viewer);
+
+    const LabelFormtr = new ShapeLabelsFormatter();
+
+    anno.formatters = [...anno.formatters, LabelFormtr];
+
 
     anno.on('deleteAnnotation', async (annotation) => {
       // console.log(annotation);
@@ -109,7 +112,8 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr })
     });
 
     anno.on("createAnnotation", async function (annotation) {
-      console.log(annotation);
+
+
       await onFetchData('http://127.0.0.1:5000/getAnnotation', 'POST', annotation)
 
     });
@@ -120,11 +124,16 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr })
         "@context": "http://www.w3.org/ns/anno.jsonld",
         id: annotDetArr[i].id,
         type: "Annotation",
-        body: {
+        body: [{
           type: "TextualBody",
           value: annotDetArr[i].title,
           format: "text/plain",
         },
+        {
+          purpose: "tagging",
+          value: annotDetArr[i].title,
+        }
+        ],
         target: {
           source: "http://example.com/image.jpg", // Replace with your image URL
           selector: {
