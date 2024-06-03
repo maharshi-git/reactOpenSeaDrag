@@ -59,48 +59,11 @@ const SuspectedTileViewer = () => {
   // const [itemsPerPage, setItemsPerPage] = useState(16);
   const [xsVal, setXsVal] = useState(3);
 
+  const [gridx, setGridx] = useState(4);
+  const [gridy, setGridy] = useState(3);
+
 
   useEffect(() => {
-    // const fetchData = async () => {
-    //   const path = 'http://localhost:5000/getSavedAnnotation'; // Replace with your API path
-    //   const method = 'GET'; // Replace with your method
-    //   const body = {}; // Replace with your body
-
-    //   try {
-    //     const response = await fetch(path, {
-    //       method: method,
-    //       headers: {
-    //         'Content-Type': 'application/json'
-    //       }
-    //     });
-
-    //     if (!response.ok) {
-    //       throw new Error(`HTTP error! status: ${response.status}`);
-    //     }
-
-    //     const annotDet = await response.json();
-    //     // setData(data);
-
-
-    //     let annotDetArr = []
-    //     let xywh, id
-    //     for (var i = 0; i < annotDet.length; i++) {
-    //       xywh = `xywh=pixel:${annotDet[i].coordinates.x},${annotDet[i].coordinates.y},${annotDet[i].coordinates.width},${annotDet[i].coordinates.height}`
-    //       id = annotDet[i].id
-    //       let annotObj = {
-    //         xywh: xywh,
-    //         id: id
-
-    //       }
-
-    //       annotDetArr.push(annotObj);
-    //     }
-    //     setAnnotArr(annotDetArr);
-
-    //   } catch (error) {
-    //     console.error('There was a problem with the fetch operation: ', error);
-    //   }
-    // };
 
     const fetchDataAnnotation = async () => {
       const path = 'http://localhost:5000/tileSlide'; // Replace with your API path
@@ -176,7 +139,7 @@ const SuspectedTileViewer = () => {
   }, []);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(8);
+  const [itemsPerPage, setItemsPerPage] = useState(12);
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -324,22 +287,10 @@ const SuspectedTileViewer = () => {
       console.error('There was a problem with the fetch operation: ', error);
     }
   };
+  const items = Array.from({ length: 32 });
 
   return (
-    <div className="container">
-
-
-      {/* <Modal show={show} onHide={handleClose} fullscreen={false} backdrop="static" keyboard={false}>
-        <Modal.Header closeButton>
-          <Modal.Title>OpenSeadragon Viewer</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <DeepZoomViewer zoomLevel={zoomLevel} xCoord={xCoord} yCoord={yCoord} annotDetArr={annotArr}></DeepZoomViewer>
-        </Modal.Body>
-        <Modal.Footer>
-
-        </Modal.Footer>
-      </Modal> */}
+    <div>
 
       {/* <Draggable >
         <div className="dialogBox" style={{position: "absolute", top: "50%", zIndex:"1000", transform: "translate(-50%, -50%)"}}>
@@ -352,14 +303,14 @@ const SuspectedTileViewer = () => {
         <div>
           <SideNav
             onSelect={(selected) => {
-              // Add your code here
+
             }}
             style={{ background: "#1976d2" }}>
             <SideNav.Toggle />
             <SideNav.Nav defaultSelected="home">
               <NavItem eventKey="home">
                 <NavIcon>
-                  {/* <i src={homeIcon} className="fa fa-fw fa-home" style={{ fontSize: '1.75em' }} /> */}
+
                   <img src={homeIcon} style={{ fontSize: '1rem', width: "2rem", color: "white" }} />
                 </NavIcon>
                 <NavText>
@@ -369,7 +320,7 @@ const SuspectedTileViewer = () => {
 
               <NavItem eventKey="changeDimension">
                 <NavIcon>
-                  {/* <i className="fa fa-fw fa-line-chart" style={{ fontSize: '1.75em' }} /> */}
+
                   <img src={gridIcon} style={{ fontSize: '1rem', width: "2rem", color: "white" }} />
                 </NavIcon>
                 <NavText>
@@ -377,17 +328,35 @@ const SuspectedTileViewer = () => {
                 </NavText>
                 <NavItem eventKey="charts/linechart">
                   <NavText>
-                    {/* <button onClick={() => { onChangeItemsPerPage(1) }} className="btn btn-primary">1x1</button>
-                    <button onClick={() => { onChangeItemsPerPage(4) }} className="btn btn-primary">2x1</button>
-                    <button onClick={() => { onChangeItemsPerPage(9) }} className="btn btn-primary">3x1</button>
-                    <button onClick={() => { onChangeItemsPerPage(16) }} className="btn btn-primary">4x2</button>
-                    <button onClick={() => { onChangeItemsPerPage(16) }} className="btn btn-primary">6x3</button> */}
-                    <button onClick={() => { onChangeItemsPerPage2(1) }} className="btn btn-primary">1x1</button>
-                    <button onClick={() => { onChangeItemsPerPage2(2) }} className="btn btn-primary">2x1</button>
-                    <button onClick={() => { onChangeItemsPerPage2(3) }} className="btn btn-primary">3x1</button>
-                    <button onClick={() => { onChangeItemsPerPage2(4) }} className="btn btn-primary">4x2</button>
-                    <button onClick={() => { onChangeItemsPerPage2(6) }} className="btn btn-primary">6x3</button>
-                    {/* <button onClick={() => { onChangeItemsPerPage(16) }} className="btn btn-primary">4x2</button> */}
+                    <input
+                      type="number"
+                      value={gridx}
+                      onChange={(event) => {
+                        const newGridx = Number(event.target.value);
+                        if (newGridx === 0) {
+                          setGridx("")
+                          return;
+                        }
+                        setGridx(newGridx);
+                        setItemsPerPage(newGridx * gridy);
+                      }}
+                      style={{ height: "1rem" }}
+                    />
+                    <input
+                      type="number"
+                      value={gridy}
+                      onChange={(event) => {
+                        const newGridy = Number(event.target.value);
+                        if (newGridy === 0) {
+                          setGridy("")
+                          return;
+                        }
+                        setGridy(newGridy);
+                        setItemsPerPage(gridx * newGridy);
+                      }}
+                      style={{ height: "1rem" }}
+                    />
+
                   </NavText>
                 </NavItem>
 
@@ -413,36 +382,34 @@ const SuspectedTileViewer = () => {
 
 
               <NavItem eventKey="changeDimension">
-                
+
                 <NavText style={{ marginLeft: "0.7rem" }}>
-                {currentPage}/{Math.ceil(images.length / itemsPerPage)}
+                  {currentPage}/{Math.ceil(images.length / itemsPerPage)}
                 </NavText>
                 <NavItem eventKey="charts/linechart">
                   <NavText>
-                  <input  onKeyDown={(event) => {
+                    <input onKeyDown={(event) => {
                       setCurrentPage(event.target.value)
-                    }} style={{height: "1rem"}}></input>
+                    }} style={{ height: "1rem" }}></input>
                   </NavText>
                 </NavItem>
               </NavItem>
             </SideNav.Nav>
           </SideNav>
         </div>
-        <Grid container spacing={0} >
-          {
-            currentItems.map((image, index) => (
-              <Grid item xs={xsVal}>
-                <Item>
-                  <button style={{ border: "none" }} onClick={() => handleImageClick(image.zoom, image.x, image.y, image.annotation)}>
-                    <p>{image.alt}</p>
-                    <img className="card-img-top" key={index} src={image.src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  </button>
-                </Item>
-              </Grid>
-            ))
-          }
+        <div className="grid" style={{
+          display: "grid",
+          gridTemplateColumns: `repeat(${gridx}, 1fr)`,
+          gridTemplateRows: `repeat(${gridy}, 1fr)`
+        }}>
+          {currentItems.map((image, index) => (
+            <div key={index} className="grid-item">
 
-        </Grid>
+              <img className="imageBtn" key={index} src={image.src} alt="" onClick={() => handleImageClick(image.zoom, image.x, image.y, image.annotation)} style={{ height: "100%" }} />
+
+            </div>
+          ))}
+        </div>
         <SlidingPane
           className="some-custom-class"
           overlayClassName="some-custom-overlay-class"
@@ -459,7 +426,7 @@ const SuspectedTileViewer = () => {
         </SlidingPane>
       </div>
 
-    </div>
+    </div >
   );
 };
 

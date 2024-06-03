@@ -83,6 +83,9 @@
 .image-grid img {
   cursor: pointer;
 }
+.imageBtn{
+  cursor: pointer;
+}
 
 
 .react-photo-gallery--gallery {
@@ -103,7 +106,7 @@
   overflow: auto;
 }
 
-.grid-container {
+/* .grid-container {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   grid-template-rows: repeat(4, 1fr);
@@ -119,4 +122,27 @@
   background-color: #ccc;
   border: 1px solid #333;
   font-size: 1.5rem;
+} */
+
+.grid {
+  /* display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: repeat(3, 1fr); */
+  height: 100vh; /* Fill the entire screen */
+  width: 100vw; /* Fill the entire screen */
+  gap: 10px; /* Optional: add some gap between the grid items */
+}
+
+.grid-item {
+  background-color: #000000; /* Optional: add a background color to see the grid items */
+  overflow: hidden;
+  
+}
+.grid-item img{
+  max-width: 100%;
+  max-height: 100%;
+  display: block; /* Ensure the image is a block element */
+  margin: auto; /* Center the image in its container */
+  object-fit: contain;
+  
 }
