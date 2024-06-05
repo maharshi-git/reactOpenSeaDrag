@@ -89,7 +89,7 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr })
       // Append the button to the overlay
       // overlay.node().appendChild(button);
 
-      // viewer.setFullScreen(true);
+      viewer.setFullScreen(true);
 
     });
 

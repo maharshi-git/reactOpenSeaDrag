@@ -85,7 +85,7 @@ const SuspectedTileViewer = () => {
     // ...other menu items...
   ];
 
-  const onRightClick = (event,id) => {
+  const onRightClick = (event, id) => {
     if (cm.current) {
       setImageId(id);
       cm.current.show(event);
@@ -239,10 +239,40 @@ const SuspectedTileViewer = () => {
     // };
   }, []);
 
+  
+  const fetchData = async (pathT) => {
+    const path = `http://localhost:5000/${pathT}`; // Replace with your API path
+    const method = 'GET'; // Replace with your method
+    const body = {}; // Replace with your body
+
+    return new Promise((resolve, reject) => {
+      fetch(path, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+
+        .then((response) => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response;
+        })
+        .then((data) => {
+          resolve(data);
+        })
+        .catch((error) => {
+          console.error('There was a problem with the fetch operation: ', error);
+          reject(error);
+        });
+    });
+  }
+
   const handleMenuCategory = (cat, id) => {
 
     let oldCat = images.find(x => x.id === id).cat;
-    if(oldCat.indexOf(cat) > -1){
+    if (oldCat.indexOf(cat) > -1) {
       return;
     }
 
@@ -252,12 +282,8 @@ const SuspectedTileViewer = () => {
     setImages([...images]);
     currentItems.find(x => x.id === id).cat = newCat;
 
-  }
+    fetchData(`updateCategory/${id}/${newCat}`)
 
-
-  const handleClose = () => {
-    setShow(false);
-    fetchData();
   }
 
 
@@ -358,46 +384,48 @@ const SuspectedTileViewer = () => {
 
   }
 
-  const fetchData = async () => {
-    const path = 'http://localhost:5000/getSavedAnnotation'; // Replace with your API path
-    const method = 'GET'; // Replace with your method
-    const body = {}; // Replace with your body
+  // const fetchData = async () => {
+  //   const path = 'http://localhost:5000/getSavedAnnotation'; // Replace with your API path
+  //   const method = 'GET'; // Replace with your method
+  //   const body = {}; // Replace with your body
 
-    try {
-      const response = await fetch(path, {
-        method: method,
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
+  //   try {
+  //     const response = await fetch(path, {
+  //       method: method,
+  //       headers: {
+  //         'Content-Type': 'application/json'
+  //       }
+  //     });
 
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
+  //     if (!response.ok) {
+  //       throw new Error(`HTTP error! status: ${response.status}`);
+  //     }
 
-      const annotDet = await response.json();
-      // setData(data);
+  //     const annotDet = await response.json();
+  //     // setData(data);
 
 
-      let annotDetArr = []
-      let xywh, id
-      for (var i = 0; i < annotDet.length; i++) {
-        xywh = `xywh=pixel:${annotDet[i].coordinates.x},${annotDet[i].coordinates.y},${annotDet[i].coordinates.width},${annotDet[i].coordinates.height}`
-        id = annotDet[i].id
-        let annotObj = {
-          xywh: xywh,
-          id: id
+  //     let annotDetArr = []
+  //     let xywh, id
+  //     for (var i = 0; i < annotDet.length; i++) {
+  //       xywh = `xywh=pixel:${annotDet[i].coordinates.x},${annotDet[i].coordinates.y},${annotDet[i].coordinates.width},${annotDet[i].coordinates.height}`
+  //       id = annotDet[i].id
+  //       let annotObj = {
+  //         xywh: xywh,
+  //         id: id
 
-        }
+  //       }
 
-        annotDetArr.push(annotObj);
-      }
-      setAnnotArr(annotDetArr);
+  //       annotDetArr.push(annotObj);
+  //     }
+  //     setAnnotArr(annotDetArr);
 
-    } catch (error) {
-      console.error('There was a problem with the fetch operation: ', error);
-    }
-  };
+  //   } catch (error) {
+  //     console.error('There was a problem with the fetch operation: ', error);
+  //   }
+  // };
+
+
   const toggleFullScreen = () => {
 
     if (document.documentElement.requestFullscreen) {
