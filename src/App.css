@@ -146,3 +146,26 @@
   object-fit: contain;
   
 }
+
+.p-contextmenu .p-menuitem-link {
+    color: #333;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    padding: .5em .75em;
+    cursor: pointer;
+    min-height: 1em;
+    overflow: hidden;
+    position: relative;
+    background-color: #f4f4f4;
+    border: none
+}
+
+.p-contextmenu .p-menuitem-link:hover {
+    background: #f4f4f4;
+    color: #1976d2;
+}
+
+.p-contextmenu .p-menuitem-text {
+    margin: 0 .5em 0 .5em;
+}

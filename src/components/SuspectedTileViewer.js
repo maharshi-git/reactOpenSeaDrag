@@ -14,6 +14,9 @@ import "react-sliding-pane/dist/react-sliding-pane.css";
 
 import Draggable from 'react-draggable';
 
+// import { ContextMenu, MenuItem, ContextMenuTrigger } from "react-contextmenu";
+import { ContextMenu } from 'primereact/contextmenu';
+
 
 import SideNav, { Toggle, Nav, NavItem, NavIcon, NavText } from '@trendmicro/react-sidenav';
 
@@ -68,6 +71,28 @@ const SuspectedTileViewer = () => {
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = images.slice(indexOfFirstItem, indexOfLastItem);
 
+  const [imageId, setImageId] = useState();
+
+  const items = [
+    { label: 'HSIL', command: (event) => handleMenuCategory('HSIL', imageId) },
+    { label: 'LSIL', command: (event) => handleMenuCategory('LSIL', imageId) },
+    { label: 'ASCH', command: (event) => handleMenuCategory('ASCH', imageId) },
+    { label: 'ASCUS', command: (event) => handleMenuCategory('ASCUS', imageId) },
+    { label: 'AGUS', command: (event) => handleMenuCategory('AGUS', imageId) },
+    { label: 'REVIEW', command: (event) => handleMenuCategory('REVIEW', imageId) },
+    { label: 'FP', command: (event) => handleMenuCategory('FP', imageId) },
+    { label: 'UNDP', command: (event) => handleMenuCategory('UNDP', imageId) },
+    // ...other menu items...
+  ];
+
+  const onRightClick = (event,id) => {
+    if (cm.current) {
+      setImageId(id);
+      cm.current.show(event);
+    }
+  };
+
+  const cm = useRef(null);
 
   useEffect(() => {
 
@@ -153,8 +178,9 @@ const SuspectedTileViewer = () => {
             zoom: 64,
             x: x.openSeaXCoord,
             y: x.openSeaYCoord,
-            annotation: x.title
-
+            annotation: x.title,
+            cat: x.cat,
+            title: x.title
           }
 
         })
@@ -194,10 +220,6 @@ const SuspectedTileViewer = () => {
           setImages(newImgArr)
         }
 
-        // setImages(imagesArr)
-
-
-
 
         console.log(annotDet);
         setAnnotArrNDPI(annotDet.Predicts);
@@ -209,23 +231,7 @@ const SuspectedTileViewer = () => {
       }
     }
 
-    // setTimeout(async () => {
-    //   if (images.length > 0) {
-    //     let Images12
-    //     for (var i in images.length / itemsPerPage) {
 
-    //       Images12 = images.slice(0, 12);
-
-    //       let listImages = await Promise.all(Images12.map(images =>
-    //         fetchData(`get_image/${images[i].id}`
-    //         ))
-    //       );
-    //     }
-    //   }
-    // }, 100);
-
-
-    // fetchData();
     fetchDataAnnotation();
 
     // return () => {
@@ -233,6 +239,20 @@ const SuspectedTileViewer = () => {
     // };
   }, []);
 
+  const handleMenuCategory = (cat, id) => {
+
+    let oldCat = images.find(x => x.id === id).cat;
+    if(oldCat.indexOf(cat) > -1){
+      return;
+    }
+
+    let newCat = oldCat + "," + cat;
+    newCat = newCat.replace('none,', '')
+    images.find(x => x.id === id).cat = newCat;
+    setImages([...images]);
+    currentItems.find(x => x.id === id).cat = newCat;
+
+  }
 
 
   const handleClose = () => {
@@ -256,7 +276,7 @@ const SuspectedTileViewer = () => {
 
   const handlePageClick = (pageNumber) => {
     if (
-      pageNumber < 1 
+      pageNumber < 1
       ||
       pageNumber > Math.ceil(images.length / itemsPerPage)
     ) {
@@ -466,7 +486,12 @@ const SuspectedTileViewer = () => {
               <NavItem eventKey="nextPage" onClick={() => handlePageClick(currentPage + 1)}>
                 <NavIcon>
                   {/* <i src={homeIcon} className="fa fa-fw fa-home" style={{ fontSize: '1.75em' }} /> */}
-                  <img src={nextIcon} style={{ fontSize: '1rem', width: "2rem", color: "white" }} />
+                  <img src={nextIcon} style={{ fontSize: '1rem', width: "2rem", color: "white" }}>
+
+                  </img>
+                  {/* <div style={{position: "absolute", top: "10px", left: "10px", color: "white", background: "rgba(0, 0, 0, 0.5)", padding: "5px"}}>
+                    Your Title Here
+                  </div> */}
                 </NavIcon>
                 <NavText>
                   Next Page
@@ -506,10 +531,17 @@ const SuspectedTileViewer = () => {
           marginLeft: "65px"
         }}>
           {currentItems.map((image, index) => (
-            <div key={index} className="grid-item">
+            <div key={index} className="grid-item" style={{ position: 'relative' }}>
+              <ContextMenu model={[...items,]} ref={cm} breakpoint="767px" />
+              <img className="imageBtn" src={image.src2} alt="" onClick={() => handleImageClick(image.zoom, image.x, image.y, image.annotation)} style={{ height: "100%" }} onContextMenu={(event) => onRightClick(event, image.id)} />
 
-              <img className="imageBtn" key={index} src={image.src2} alt="" onClick={() => handleImageClick(image.zoom, image.x, image.y, image.annotation)} style={{ height: "100%" }} />
 
+              <div style={{ position: "absolute", top: "10px", left: "10px", color: "white", background: "rgba(0, 0, 0, 0.5)", padding: "5px" }}>
+                {image.title}
+              </div>
+              <div style={{ position: "absolute", bottom: "10px", left: "10px", color: "white", background: "rgba(0, 0, 0, 0.5)", padding: "5px" }}>
+                {image.cat === "none" ? '' : image.cat}
+              </div>
             </div>
           ))}
         </div>
