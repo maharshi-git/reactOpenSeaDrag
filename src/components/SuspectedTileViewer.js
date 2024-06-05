@@ -5,6 +5,7 @@ import homeIcon from "../resources/icons/home (1).png";
 import gridIcon from "../resources/icons/menu.png";
 import nextIcon from "../resources/icons/next.png";
 import prevIcon from "../resources/icons/arrow.png";
+import fullScreenIcon from "../resources/icons/fullscreen.png";
 import { Modal } from 'react-bootstrap';
 import DeepZoomViewer from "./DeepZoomViewer";
 // import Slider from '@mui/material/Slider';
@@ -55,15 +56,74 @@ const SuspectedTileViewer = () => {
 
   const [images, setImages] = useState([])
 
-
-  // const [itemsPerPage, setItemsPerPage] = useState(16);
   const [xsVal, setXsVal] = useState(3);
 
   const [gridx, setGridx] = useState(4);
   const [gridy, setGridy] = useState(3);
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(12);
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = images.slice(indexOfFirstItem, indexOfLastItem);
+
 
   useEffect(() => {
+
+    const handleKeyDown = (event) => {
+      switch (event.key) {
+        case 'ArrowRight':
+          // Call the function for the right arrow key here
+          handlePageClick(currentPage + 1);
+          break;
+        case 'ArrowLeft':
+          // Call the function for the left arrow key here
+          handlePageClick(currentPage - 1);
+          break;
+
+        case 'F':
+        case 'f':
+          toggleFullScreen();
+          break;
+        default:
+          break;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+
+    const fetchData = async (pathT) => {
+      const path = `http://localhost:5000/${pathT}`; // Replace with your API path
+      const method = 'GET'; // Replace with your method
+      const body = {}; // Replace with your body
+
+      return new Promise((resolve, reject) => {
+        fetch(path, {
+          method: method,
+          headers: {
+            'Content-Type': 'image/jpeg'
+          }
+        })
+
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response;
+          })
+          .then((data) => {
+            resolve(data);
+          })
+          .catch((error) => {
+            console.error('There was a problem with the fetch operation: ', error);
+            reject(error);
+          });
+      });
+    }
+
+
 
     const fetchDataAnnotation = async () => {
       const path = 'http://localhost:5000/tileSlide'; // Replace with your API path
@@ -87,6 +147,7 @@ const SuspectedTileViewer = () => {
 
         let imagesArr = annotDet.Predicts.map(x => {
           return {
+            id: x.id,
             src: `http://localhost:5000/get_image/${x.id}`,
             alt: x.title,
             zoom: 64,
@@ -106,24 +167,38 @@ const SuspectedTileViewer = () => {
             title: x.title
           }
         })
-        // let annotDetArr = []
 
-
-        // let xywh, id
-        // for (var i = 0; i < annotDet.Predicts.length; i++) {
-        //   xywh = `xywh=pixel:${annotDet[i].coordinates.x},${annotDet[i].coordinates.y},${annotDet[i].coordinates.width},${annotDet[i].coordinates.height}`
-        //   id = annotDet[i].id
-        //   let annotObj = {
-        //     xywh: xywh,
-        //     id: id
-
-        //   }
-
-        //   annotDetArr.push(annotObj);
-        // }
         setAnnotArr(annotDetArr);
 
-        setImages(imagesArr)
+        let Images12, Images20, newImgArr = [], newImgArr2;
+        let noCalls = Math.floor(imagesArr.length / 20);
+        for (var i = 0; i < noCalls; i++) {
+
+          Images20 = imagesArr.slice(i * 20, (i + 1) * 20);
+
+          let listImages = await Promise.all(Images20.map(images =>
+            fetchData(`get_image/${images.id}`)
+              .then(response => response.blob())
+              .then(blob => URL.createObjectURL(blob))
+          )
+          );
+
+          Images20.forEach((x, index) => {
+
+            x.src2 = listImages[index]
+
+          })
+
+          newImgArr = [...newImgArr, ...Images20]
+
+          setImages(newImgArr)
+        }
+
+        // setImages(imagesArr)
+
+
+
+
         console.log(annotDet);
         setAnnotArrNDPI(annotDet.Predicts);
 
@@ -134,16 +209,31 @@ const SuspectedTileViewer = () => {
       }
     }
 
+    // setTimeout(async () => {
+    //   if (images.length > 0) {
+    //     let Images12
+    //     for (var i in images.length / itemsPerPage) {
+
+    //       Images12 = images.slice(0, 12);
+
+    //       let listImages = await Promise.all(Images12.map(images =>
+    //         fetchData(`get_image/${images[i].id}`
+    //         ))
+    //       );
+    //     }
+    //   }
+    // }, 100);
+
+
     // fetchData();
     fetchDataAnnotation();
+
+    // return () => {
+    //   window.removeEventListener('keydown', handleKeyDown);
+    // };
   }, []);
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(12);
 
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = images.slice(indexOfFirstItem, indexOfLastItem);
 
   const handleClose = () => {
     setShow(false);
@@ -166,7 +256,8 @@ const SuspectedTileViewer = () => {
 
   const handlePageClick = (pageNumber) => {
     if (
-      pageNumber < 1 ||
+      pageNumber < 1 
+      ||
       pageNumber > Math.ceil(images.length / itemsPerPage)
     ) {
       return;
@@ -287,7 +378,18 @@ const SuspectedTileViewer = () => {
       console.error('There was a problem with the fetch operation: ', error);
     }
   };
-  const items = Array.from({ length: 32 });
+  const toggleFullScreen = () => {
+
+    if (document.documentElement.requestFullscreen) {
+      document.documentElement.requestFullscreen();
+    } else if (document.documentElement.mozRequestFullScreen) { /* Firefox */
+      document.documentElement.mozRequestFullScreen();
+    } else if (document.documentElement.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
+      document.documentElement.webkitRequestFullscreen();
+    } else if (document.documentElement.msRequestFullscreen) { /* IE/Edge */
+      document.documentElement.msRequestFullscreen();
+    }
+  }
 
   return (
     <div>
@@ -308,10 +410,10 @@ const SuspectedTileViewer = () => {
             style={{ background: "#1976d2" }}>
             <SideNav.Toggle />
             <SideNav.Nav defaultSelected="home">
-              <NavItem eventKey="home">
+              <NavItem eventKey="home" onClick={() => toggleFullScreen()}>
                 <NavIcon>
 
-                  <img src={homeIcon} style={{ fontSize: '1rem', width: "2rem", color: "white" }} />
+                  <img src={fullScreenIcon} style={{ fontSize: '1rem', width: "2rem", color: "white" }} />
                 </NavIcon>
                 <NavText>
                   Home
@@ -400,12 +502,13 @@ const SuspectedTileViewer = () => {
         <div className="grid" style={{
           display: "grid",
           gridTemplateColumns: `repeat(${gridx}, 1fr)`,
-          gridTemplateRows: `repeat(${gridy}, 1fr)`
+          gridTemplateRows: `repeat(${gridy}, 1fr)`,
+          marginLeft: "65px"
         }}>
           {currentItems.map((image, index) => (
             <div key={index} className="grid-item">
 
-              <img className="imageBtn" key={index} src={image.src} alt="" onClick={() => handleImageClick(image.zoom, image.x, image.y, image.annotation)} style={{ height: "100%" }} />
+              <img className="imageBtn" key={index} src={image.src2} alt="" onClick={() => handleImageClick(image.zoom, image.x, image.y, image.annotation)} style={{ height: "100%" }} />
 
             </div>
           ))}
