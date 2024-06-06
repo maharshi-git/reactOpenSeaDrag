@@ -7,7 +7,7 @@ import SuspectedTileViewer from "./components/SuspectedTileViewer";
 import FileViewer from "./components/FileViewer";
 
 import ReactGallery from "./components/ReactGallery";
-import MindMapComponent from "./components/MindMapComponent";
+
 
 import "./App.css";
 
@@ -21,9 +21,9 @@ function App() {
       <BrowserRouter >
         <Routes>
           <Route path="/" element={<FileViewer />} />
-          <Route path="/about" element={<SuspectedTileViewer />} />
+          <Route path="/about/:id" element={<SuspectedTileViewer />} />
           <Route path="/gal" element={<ReactGallery />} />
-          <Route path="/mindMapComp" element={<MindMapComponent />} />
+     
         </Routes>
       </BrowserRouter>
     </div>

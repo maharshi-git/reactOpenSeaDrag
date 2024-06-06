@@ -87,6 +87,13 @@
   cursor: pointer;
 }
 
+.image-grid-scale img {
+  cursor: crosshair;
+}
+.imageBtnScale{
+  cursor: crosshair;
+}
+
 
 .react-photo-gallery--gallery {
   position: fixed;

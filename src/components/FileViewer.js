@@ -33,7 +33,7 @@ const FileViewer = () => {
       <h2>People</h2>
       <ul className="list-group">
         {people.map((person) => (
-          <Link to="/about">
+          <Link to={`/about/${person.id}`}>
             
             <li
               key={person.id}
