@@ -129,32 +129,32 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr })
 
     });
 
-    // for (var i in annotDetArr) {
+    for (var i in annotDetArr) {
 
-    //   anno.addAnnotation({
-    //     "@context": "http://www.w3.org/ns/anno.jsonld",
-    //     id: annotDetArr[i].id,
-    //     type: "Annotation",
-    //     body: [{
-    //       type: "TextualBody",
-    //       value: annotDetArr[i].title,
-    //       format: "text/plain",
-    //     },
-    //     {
-    //       purpose: "tagging",
-    //       value: annotDetArr[i].title,
-    //     }
-    //     ],
-    //     target: {
-    //       source: "http://example.com/image.jpg", // Replace with your image URL
-    //       selector: {
-    //         type: "FragmentSelector",
-    //         conformsTo: "http://www.w3.org/TR/media-frags/",
-    //         value: annotDetArr[i].xywh, // Replace with your annotation coordinates
-    //       },
-    //     },
-    //   });
-    // }
+      anno.addAnnotation({
+        "@context": "http://www.w3.org/ns/anno.jsonld",
+        id: annotDetArr[i].id,
+        type: "Annotation",
+        body: [{
+          type: "TextualBody",
+          value: annotDetArr[i].title,
+          format: "text/plain",
+        },
+        {
+          purpose: "tagging",
+          value: annotDetArr[i].title,
+        }
+        ],
+        target: {
+          source: "http://example.com/image.jpg", // Replace with your image URL
+          selector: {
+            type: "FragmentSelector",
+            conformsTo: "http://www.w3.org/TR/media-frags/",
+            value: annotDetArr[i].xywh, // Replace with your annotation coordinates
+          },
+        },
+      });
+    }
 
 
     viewer.addOverlay({
