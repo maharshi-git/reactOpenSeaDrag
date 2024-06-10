@@ -89,7 +89,7 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr })
       // Append the button to the overlay
       // overlay.node().appendChild(button);
 
-      viewer.setFullScreen(true);
+      // viewer.setFullScreen(true);
 
     });
 
@@ -100,6 +100,9 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr })
       viewer.source.getTileUrl = function () {
         return getTileUrl.apply(this, arguments) + "?v=" + "261d9b83";
       };
+
+      // viewer.canvas.style.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
+      viewer.canvas.style.filter = `brightness(160%) contrast(80%)`;
 
     });
 
@@ -126,32 +129,32 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr })
 
     });
 
-    for (var i in annotDetArr) {
+    // for (var i in annotDetArr) {
 
-      anno.addAnnotation({
-        "@context": "http://www.w3.org/ns/anno.jsonld",
-        id: annotDetArr[i].id,
-        type: "Annotation",
-        body: [{
-          type: "TextualBody",
-          value: annotDetArr[i].title,
-          format: "text/plain",
-        },
-        {
-          purpose: "tagging",
-          value: annotDetArr[i].title,
-        }
-        ],
-        target: {
-          source: "http://example.com/image.jpg", // Replace with your image URL
-          selector: {
-            type: "FragmentSelector",
-            conformsTo: "http://www.w3.org/TR/media-frags/",
-            value: annotDetArr[i].xywh, // Replace with your annotation coordinates
-          },
-        },
-      });
-    }
+    //   anno.addAnnotation({
+    //     "@context": "http://www.w3.org/ns/anno.jsonld",
+    //     id: annotDetArr[i].id,
+    //     type: "Annotation",
+    //     body: [{
+    //       type: "TextualBody",
+    //       value: annotDetArr[i].title,
+    //       format: "text/plain",
+    //     },
+    //     {
+    //       purpose: "tagging",
+    //       value: annotDetArr[i].title,
+    //     }
+    //     ],
+    //     target: {
+    //       source: "http://example.com/image.jpg", // Replace with your image URL
+    //       selector: {
+    //         type: "FragmentSelector",
+    //         conformsTo: "http://www.w3.org/TR/media-frags/",
+    //         value: annotDetArr[i].xywh, // Replace with your annotation coordinates
+    //       },
+    //     },
+    //   });
+    // }
 
 
     viewer.addOverlay({
@@ -251,24 +254,17 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr })
   };
 
 
-
-
-
-
-
   return (
     <div>
-
-
       <div style={{ display: "flex" }}>
         <div
           id="viewer"
           ref={viewerRef}
-          style={{ width: "800px", height: "600px" }}
+          style={{ width: "100%", height: "850px", padding: "none" }}
         />
 
 
-        <div
+        {/* <div
           style={{
             display: "flex",
             flexDirection: "column",
@@ -332,10 +328,8 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr })
             <Col>xCoord: {xCoordMain}</Col>
             <Col>yCoord: {yCoordMain}</Col>
           </Row>
-          {/* <button className="btn btn-primary" onClick={onZoomPress}>
-            Navigate to concerned part
-          </button> */}
-        </div>
+     
+        </div> */}
       </div>
     </div>
   );

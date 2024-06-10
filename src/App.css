@@ -176,3 +176,14 @@
 .p-contextmenu .p-menuitem-text {
     margin: 0 .5em 0 .5em;
 }
+canvas {
+  border: 1px solid black;
+}
+
+.fullScreenSlidePane{
+  width: 94% ! important
+}
+.slide-pane__content{
+padding: 5px;
+height: 100%
+}

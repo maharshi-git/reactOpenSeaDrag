@@ -9,6 +9,9 @@ import fullScreenIcon from "../resources/icons/fullscreen.png";
 import nextPatient from '../resources/icons/next (1).png'
 import previousPatient from '../resources/icons/back.png'
 import measureIcon from '../resources/icons/measure.png'
+import imageEdit from '../resources/icons/eye.png'
+
+
 // import { Modal } from 'react-bootstrap';
 import DeepZoomViewer from "./DeepZoomViewer";
 // import Slider from '@mui/material/Slider';
@@ -434,6 +437,15 @@ const SuspectedTileViewer = () => {
                   Enable Measure
                 </NavText>
               </NavItem>
+              <NavItem active={false} eventKey="changeDimensions" onClick={() => {setScaleSelected(!scaleSelected);  }}>
+                <NavIcon>
+                  {/* <i src={homeIcon} className="fa fa-fw fa-home" style={{ fontSize: '1.75em' }} /> */}
+                  <img src={imageEdit} style={{ fontSize: '1rem', width: "2rem", color: "white" }} />
+                </NavIcon>
+                <NavText>
+                  Change dimensions
+                </NavText>
+              </NavItem>
               <NavItem eventKey="nextPatient" >
                 <NavIcon>
                   {/* <i src={homeIcon} className="fa fa-fw fa-home" style={{ fontSize: '1.75em' }} /> */}
@@ -492,11 +504,13 @@ const SuspectedTileViewer = () => {
           ))}
         </div>
         <SlidingPane
-          className="some-custom-class"
+          className="some-custom-class fullScreenSlidePane"
           overlayClassName="some-custom-overlay-class"
           isOpen={showDragonView}
 
-          title={selectedAnnotaiton}
+          // title={selectedAnnotaiton}
+          hideHeader={true}
+       
           // subtitle="Optional subtitle."
           onRequestClose={() => {
             // triggered on "<" on left top click or on outside click
