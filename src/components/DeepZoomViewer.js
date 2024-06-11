@@ -137,7 +137,8 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr, i
         const distanceInViewportCoordinates = Math.sqrt(dx * dx + dy * dy);
 
         // Display a message with the distance.
-        console.log('Distance: ' + distanceInViewportCoordinates);
+        // console.log('Distance: ' + distanceInViewportCoordinates);
+        alert('Distance: ' + distanceInViewportCoordinates);
 
         // Reset the start point and line.
         startPoint = null;
