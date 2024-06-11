@@ -105,7 +105,7 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr, i
 
       viewer.canvas.style.filter = imageSettings;
 
-    });
+    }); 
 
     let image = { "Image": { "Format": "jpeg", "Overlap": 1, "Size": { "Height": 61440, "Width": 60928 }, "TileSize": 510, "Url": "http://127.0.0.1:5000/tile/", "xmlns": "http://schemas.microsoft.com/deepzoom/2008" }, "crossOriginPolicy": false, "ajaxWithCredentials": false, "useCanvas": true }
 

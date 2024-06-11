@@ -67,7 +67,7 @@ function DeepZoomMain() {
         {showOSD && (
           <div
             style={{ marginTop: "1rem", marginRight: "1rem", border: "none" }}
-          >
+          > 
             <DeepZoomViewer
               setViewer2={setViewer}
               imgHelperValues={imgHelperValues}
