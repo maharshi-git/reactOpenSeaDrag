@@ -6,6 +6,8 @@ import "openseadragon-filtering";
 import OpenSeadragonImagingHelper from "@openseadragon-imaging/openseadragon-imaginghelper";
 import ShapeLabelsFormatter from "@recogito/annotorious-shape-labels";
 
+// import './openseadragon-svg-overlay.js'
+
 import './openseadragon-scalebar.js'
 import './openseadragon-svg-overlay.js'
 
@@ -58,6 +60,96 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr, i
 
     });
 
+    let ctrlPressed = false;
+    window.addEventListener('keydown', function(event) {
+      if (event.key === 'Control') {
+        ctrlPressed = true;
+        viewer.canvas.style.cursor = 'crosshair';
+      }
+    });
+
+    window.addEventListener('keyup', function(event) {
+      if (event.key === 'Control') {
+        ctrlPressed = false;
+        viewer.canvas.style.cursor = 'default';
+      }
+    });
+
+    viewer.addHandler('canvas-enter', function(event) {
+      if (ctrlPressed) {
+        viewer.canvas.style.cursor = 'crosshair';
+      }
+    });
+
+    let startPoint = null;
+    let overlay = null;
+    let line = null;
+    let anchor = null;
+
+
+    viewer.addHandler('canvas-click', function (event) {
+
+      if (!event.originalEvent.ctrlKey) {
+        return;
+      }
+
+      const viewportPoint = viewer.viewport.pointFromPixel(event.position);
+
+      if (startPoint === null) {
+
+        startPoint = viewportPoint;
+
+        overlay = viewer.svgOverlay();
+
+        anchor = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        anchor.setAttribute('cx', startPoint.x);
+        anchor.setAttribute('cy', startPoint.y);
+        anchor.setAttribute('r', '0.00005');
+        anchor.setAttribute('style', 'fill:rgb(255,0,0)');
+        overlay.node().appendChild(anchor);
+
+        // Create the line.
+        line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+        line.setAttribute('x1', startPoint.x);
+        line.setAttribute('y1', startPoint.y);
+        line.setAttribute('x2', startPoint.x);
+        line.setAttribute('y2', startPoint.y);
+        line.setAttribute('style', 'stroke:rgb(255,0,0);stroke-width:0.00001');
+        overlay.node().appendChild(line);
+
+
+      } else {
+        // This is the end of the measurement. Set the end point of the line.
+        line.setAttribute('x2', viewportPoint.x);
+        line.setAttribute('y2', viewportPoint.y);
+
+        // Create the end anchor.
+        const endAnchor = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+        endAnchor.setAttribute('cx', viewportPoint.x);
+        endAnchor.setAttribute('cy', viewportPoint.y);
+        endAnchor.setAttribute('r', '0.00005');
+        endAnchor.setAttribute('style', 'fill:rgb(255,0,0)');
+        overlay.node().appendChild(endAnchor);
+
+        // Calculate the distance in viewport coordinates.
+        const dx = viewportPoint.x - startPoint.x;
+        const dy = viewportPoint.y - startPoint.y;
+        const distanceInViewportCoordinates = Math.sqrt(dx * dx + dy * dy);
+
+        // Display a message with the distance.
+        console.log('Distance: ' + distanceInViewportCoordinates);
+
+        // Reset the start point and line.
+        startPoint = null;
+        line = null;
+        anchor = null;
+        viewer.removeHandler('canvas-drag');
+      }
+
+      // Prevent the click from zooming the viewer.
+      event.preventDefaultAction = true;
+    });
+
     viewer.addHandler("open", function () {
 
       viewer.viewport.zoomTo(zoomLevel);
@@ -79,7 +171,7 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr, i
         barThickness: 2
       });
 
-      // let overlay = viewer.svgOverlay();
+      let overlay = viewer.svgOverlay();
 
       // var button = document.createElement('button');
       // button.innerHTML = 'Click me';  // Set the button text
@@ -158,14 +250,14 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr, i
     }
 
 
-    viewer.addOverlay({
-      id: "example-overlay",
-      x: 0.33,
-      y: 0.75,
-      width: 0.2,
-      height: 0.25,
-      className: "highlight",
-    });
+    // viewer.addOverlay({
+    //   id: "example-overlay",
+    //   x: 0.33,
+    //   y: 0.75,
+    //   width: 0.2,
+    //   height: 0.25,
+    //   className: "highlight",
+    // });
 
 
 
