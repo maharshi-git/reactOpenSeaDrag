@@ -61,6 +61,15 @@ const SuspectedTileViewer = () => {
 
   const [scaleSelected, setScaleSelected] = useState(false)
 
+  const [gamma, setGamma] = useState(1);
+  const [contrast, setContrast] = useState(100);
+  const [brightness, setBrightness] = useState(160);
+  const [saturation, setSaturation] = useState(80);
+
+  const [imageSettings, setImageSettings] = useState(`brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`)
+
+  const [viewer, setViewer] = useState('')
+
   const cm = useRef(null);
 
   const items = [
@@ -72,10 +81,10 @@ const SuspectedTileViewer = () => {
     { label: 'REVIEW', command: (event) => handleMenuCategory('REVIEW', imageId) },
     { label: 'FP', command: (event) => handleMenuCategory('FP', imageId) },
     { label: 'UNDP', command: (event) => handleMenuCategory('UNDP', imageId) },
-  
+
   ];
 
- 
+
 
   useEffect(() => {
 
@@ -185,7 +194,8 @@ const SuspectedTileViewer = () => {
           return {
             xywh: `xywh=pixel:${x.x1},${x.y1},${x.x2 - x.x1},${x.y2 - x.y1}`,
             id: x.id,
-            title: x.title
+            title: x.title,
+            cat: x.cat
           }
         })
 
@@ -290,7 +300,7 @@ const SuspectedTileViewer = () => {
 
   const handleImageClick = (zoom, x, y, annotation) => {
 
-    if(scaleSelected){
+    if (scaleSelected) {
       return;
     }
 
@@ -333,6 +343,38 @@ const SuspectedTileViewer = () => {
     }
   }
 
+  const updateFilterBrigtness = (filterObj) => {
+    setBrightness(filterObj.target.value);
+    setImageSettings(`brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`);
+    viewer.canvas.style.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
+  };
+  const updateFilterContrast = (filterObj) => {
+    setContrast(filterObj.target.value);
+    viewer.canvas.style.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
+    setImageSettings(`brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`);
+  };
+  const updateFilterGamma = (filterObj) => {
+    setGamma(filterObj.target.value);
+    viewer.canvas.style.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
+    setImageSettings(`brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`);
+  };
+
+  //write a similart method for saturation
+  const updateFilterSaturation = (filterObj) => {
+    setSaturation(filterObj.target.value);
+    viewer.canvas.style.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
+    setImageSettings(`brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`);
+  };
+
+  const resetFilters = function () {
+    setBrightness(100);
+    setContrast(100);
+    setGamma(1);
+    setSaturation(100);
+    // viewer.canvas.style.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
+
+  };
+
   return (
     <div>
 
@@ -352,7 +394,7 @@ const SuspectedTileViewer = () => {
             style={{ background: "#1976d2" }}>
             <SideNav.Toggle />
             <SideNav.Nav defaultSelected="fullScreen">
-              <NavItem  eventKey="home" onClick={(event) => toggleFullScreen(event) }>
+              <NavItem eventKey="home" onClick={(event) => toggleFullScreen(event)}>
                 <NavIcon>
 
                   <img src={fullScreenIcon} style={{ fontSize: '1rem', width: "2rem", color: "white" }} />
@@ -428,7 +470,7 @@ const SuspectedTileViewer = () => {
                   Previous Page
                 </NavText>
               </NavItem>
-              <NavItem active={false} eventKey="measure" onClick={() => {setScaleSelected(!scaleSelected);  }}>
+              <NavItem active={false} eventKey="measure" onClick={() => { setScaleSelected(!scaleSelected); }}>
                 <NavIcon>
                   {/* <i src={homeIcon} className="fa fa-fw fa-home" style={{ fontSize: '1.75em' }} /> */}
                   <img src={measureIcon} style={{ fontSize: '1rem', width: "2rem", color: "white" }} />
@@ -437,14 +479,75 @@ const SuspectedTileViewer = () => {
                   Enable Measure
                 </NavText>
               </NavItem>
-              <NavItem active={false} eventKey="changeDimensions" onClick={() => {setScaleSelected(!scaleSelected);  }}>
+              <NavItem active={false} eventKey="changeImage" onClick={() => { setScaleSelected(!scaleSelected); }}>
                 <NavIcon>
                   {/* <i src={homeIcon} className="fa fa-fw fa-home" style={{ fontSize: '1.75em' }} /> */}
                   <img src={imageEdit} style={{ fontSize: '1rem', width: "2rem", color: "white" }} />
                 </NavIcon>
-                <NavText>
-                  Change dimensions
-                </NavText>
+                <NavItem>
+                  <NavText>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        marginLeft: "0.8rem",
+                        width: "200px",
+                      }}
+                    >
+                      <button className="btn btn-primary" onClick={resetFilters}>
+                        Reset
+                      </button>
+                      <label>
+                        Brightness
+                        <input
+                          type="range"
+                          min="0"
+                          max="200"
+                          value={brightness}
+                          onChange={updateFilterBrigtness}
+                          tooltip="true"
+                          class="form-range"
+                        />
+                      </label>
+                      <label>
+                        Contrast
+                        <input
+                          type="range"
+                          min="0"
+                          max="200"
+                          value={contrast}
+                          onChange={updateFilterContrast}
+                          class="form-range"
+                        />
+                      </label>
+                      <label>
+                        Gamma
+                        <input
+                          type="range"
+                          min="0"
+                          max="5"
+                          step="0.1"
+                          value={gamma}
+                          onChange={updateFilterGamma}
+                          class="form-range"
+                        />
+                      </label>
+                      <label>
+                        Saturation
+                        <input
+                          type="range"
+                          min="0"
+                          max="200"
+                          value={saturation}
+                          onChange={updateFilterSaturation}
+                          class="form-range"
+                        />
+                      </label>
+
+
+                    </div>
+                  </NavText>
+                </NavItem>
               </NavItem>
               <NavItem eventKey="nextPatient" >
                 <NavIcon>
@@ -510,14 +613,14 @@ const SuspectedTileViewer = () => {
 
           // title={selectedAnnotaiton}
           hideHeader={true}
-       
+
           // subtitle="Optional subtitle."
           onRequestClose={() => {
             // triggered on "<" on left top click or on outside click
             setShowDragonView(false);
           }}
         >
-          <DeepZoomViewer ref={childRef} zoomLevel={zoomLevel} xCoord={xCoord} yCoord={yCoord} annotDetArr={annotArr}></DeepZoomViewer>
+          <DeepZoomViewer setViewer2={setViewer} imageSettings={imageSettings} ref={childRef} zoomLevel={zoomLevel} xCoord={xCoord} yCoord={yCoord} annotDetArr={annotArr}></DeepZoomViewer>
         </SlidingPane>
       </div>
 

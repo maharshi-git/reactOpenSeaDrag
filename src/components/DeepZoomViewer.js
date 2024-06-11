@@ -11,7 +11,7 @@ import './openseadragon-svg-overlay.js'
 
 import { Row, Col } from "react-bootstrap";
 
-const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr }) => {
+const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr, imageSettings, setViewer2 }) => {
   const viewerRef = useRef();
 
 
@@ -66,7 +66,8 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr })
 
       viewer.scalebar({
         type: OpenSeadragon.ScalebarType.MICROSCOPY,
-        pixelsPerMeter: 5000000,
+        // pixelsPerMeter: 5000000,
+        pixelsPerMeter: 4524886.88,
         minWidth: "150px",
         location: OpenSeadragon.ScalebarLocation.BOTTOM_RIGHT,
         yOffset: 5,
@@ -93,6 +94,7 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr })
 
     });
 
+    // viewer.canvas.style.filter = imageSettings;
 
     viewer.addHandler("open", function () {
       var getTileUrl = viewer.source.getTileUrl;
@@ -101,8 +103,7 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr })
         return getTileUrl.apply(this, arguments) + "?v=" + "261d9b83";
       };
 
-      // viewer.canvas.style.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
-      viewer.canvas.style.filter = `brightness(160%) contrast(80%)`;
+      viewer.canvas.style.filter = imageSettings;
 
     });
 
@@ -142,7 +143,7 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr })
         },
         {
           purpose: "tagging",
-          value: annotDetArr[i].title,
+          value: annotDetArr[i].cat,
         }
         ],
         target: {
@@ -185,6 +186,8 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr })
       setYCoordMain(event.viewportCenter.y);
 
     }
+
+    setViewer2(viewer)
 
     viewer.open(image);
 
