@@ -363,7 +363,7 @@ const SuspectedTileViewer = () => {
   const updateFilterSaturation = (filterObj) => {
     setSaturation(filterObj.target.value);
     viewer.canvas.style.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
-    setImageSettings(`brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`);
+    setImageSettings(`brightness(${brightness}%) contrast(${contrast}%) saturate(80%)`);
   };
 
   const resetFilters = function () {

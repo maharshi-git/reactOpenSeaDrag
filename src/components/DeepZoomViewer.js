@@ -61,21 +61,21 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr, i
     });
 
     let ctrlPressed = false;
-    window.addEventListener('keydown', function(event) {
+    window.addEventListener('keydown', function (event) {
       if (event.key === 'Control') {
         ctrlPressed = true;
         viewer.canvas.style.cursor = 'crosshair';
       }
     });
 
-    window.addEventListener('keyup', function(event) {
+    window.addEventListener('keyup', function (event) {
       if (event.key === 'Control') {
         ctrlPressed = false;
         viewer.canvas.style.cursor = 'default';
       }
     });
 
-    viewer.addHandler('canvas-enter', function(event) {
+    viewer.addHandler('canvas-enter', function (event) {
       if (ctrlPressed) {
         viewer.canvas.style.cursor = 'crosshair';
       }
@@ -131,6 +131,8 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr, i
         endAnchor.setAttribute('style', 'fill:rgb(255,0,0)');
         overlay.node().appendChild(endAnchor);
 
+        
+
         // Calculate the distance in viewport coordinates.
         const dx = viewportPoint.x - startPoint.x;
         const dy = viewportPoint.y - startPoint.y;
@@ -138,7 +140,17 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr, i
 
         // Display a message with the distance.
         // console.log('Distance: ' + distanceInViewportCoordinates);
-        alert('Distance: ' + distanceInViewportCoordinates);
+        // alert('Distance: ' + distanceInViewportCoordinates);
+
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+        text.setAttribute('x', viewportPoint.x);
+        text.setAttribute('y', viewportPoint.y);
+        text.setAttribute('font-family', 'Arial');
+        text.setAttribute('font-size', '0.0002');
+        text.setAttribute('fill', 'black');
+        text.setAttribute('text-anchor', 'middle');
+        text.textContent = distanceInViewportCoordinates; // Set your desired value here
+        overlay.node().appendChild(text);
 
         // Reset the start point and line.
         startPoint = null;
@@ -198,7 +210,7 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr, i
 
       viewer.canvas.style.filter = imageSettings;
 
-    }); 
+    });
 
     let image = { "Image": { "Format": "jpeg", "Overlap": 1, "Size": { "Height": 61440, "Width": 60928 }, "TileSize": 510, "Url": "http://127.0.0.1:5000/tile/", "xmlns": "http://schemas.microsoft.com/deepzoom/2008" }, "crossOriginPolicy": false, "ajaxWithCredentials": false, "useCanvas": true }
 
