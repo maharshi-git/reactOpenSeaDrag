@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useParams, useNavigate } from 'react-router-dom';
 
 // import imagereport from "../resources/test.jpg";
 // import homeIcon from "../resources/icons/home (1).png";
@@ -14,6 +15,7 @@ import imageEdit from '../resources/icons/eye.png'
 
 // import { Modal } from 'react-bootstrap';
 import DeepZoomViewer from "./DeepZoomViewer";
+import OpenSeadragon from "openseadragon";
 // import Slider from '@mui/material/Slider';
 import SlidingPane from "react-sliding-pane";
 import "react-sliding-pane/dist/react-sliding-pane.css";
@@ -32,6 +34,8 @@ import '@trendmicro/react-sidenav/dist/react-sidenav.css'
 
 const SuspectedTileViewer = () => {
   //api call to get coordinates of selected file from the server
+
+  const {Doctor, tileName} = useParams();
 
   const childRef = useRef();
 
@@ -63,7 +67,7 @@ const SuspectedTileViewer = () => {
 
   const [gamma, setGamma] = useState(1);
   const [contrast, setContrast] = useState(100);
-  const [brightness, setBrightness] = useState(160);
+  const [brightness, setBrightness] = useState(50);
   const [saturation, setSaturation] = useState(80);
 
   const [imageSettings, setImageSettings] = useState(`brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`)
@@ -155,7 +159,7 @@ const SuspectedTileViewer = () => {
 
 
     const fetchDataAnnotation = async () => {
-      const path = 'http://localhost:5000/tileSlide'; // Replace with your API path
+      const path = `http://localhost:5000/tileSlide/${Doctor}/${tileName}`; // Replace with your API path
       const method = 'GET'; // Replace with your method
       const body = {}; // Replace with your body
 
@@ -177,7 +181,7 @@ const SuspectedTileViewer = () => {
         let imagesArr = annotDet.Predicts.map(x => {
           return {
             id: x.id,
-            src: `http://localhost:5000/get_image/${x.id}`,
+            src: `http://localhost:5000/get_image/${Doctor}/${tileName}/${x.id}`,
             alt: x.title,
             zoom: 64,
             x: x.openSeaXCoord,
@@ -208,7 +212,7 @@ const SuspectedTileViewer = () => {
           Images20 = imagesArr.slice(i * 12, (i + 1) * 12);
 
           let listImages = await Promise.all(Images20.map(images =>
-            fetchData(`get_image/${images.id}`)
+            fetchData(`get_image/${Doctor}/${tileName}/${images.id}`)
               .then(response => response.blob())
               .then(blob => URL.createObjectURL(blob))
           )
@@ -345,8 +349,17 @@ const SuspectedTileViewer = () => {
 
   const updateFilterBrigtness = (filterObj) => {
     setBrightness(filterObj.target.value);
-    setImageSettings(`brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`);
-    viewer.canvas.style.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
+
+    viewer.setFilterOptions({
+      filters: {
+        processors: OpenSeadragon.Filters.BRIGHTNESS(filterObj.target.value),
+        // processors: OpenSeadragon.Filters.INVERT()
+      },
+      loadMode: 'sync'
+    });
+
+    // setImageSettings(`brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`);
+    // viewer.canvas.style.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
   };
   const updateFilterContrast = (filterObj) => {
     setContrast(filterObj.target.value);
@@ -355,15 +368,32 @@ const SuspectedTileViewer = () => {
   };
   const updateFilterGamma = (filterObj) => {
     setGamma(filterObj.target.value);
-    viewer.canvas.style.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
-    setImageSettings(`brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`);
+
+    viewer.setFilterOptions({
+      filters: {
+        processors: OpenSeadragon.Filters.GAMMA(filterObj.target.value),
+        // processors: OpenSeadragon.Filters.INVERT()
+      },
+      loadMode: 'sync'
+    });
+    // viewer.canvas.style.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
+    // setImageSettings(`brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`);
   };
 
   //write a similart method for saturation
   const updateFilterSaturation = (filterObj) => {
-    setSaturation(filterObj.target.value);
-    viewer.canvas.style.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
-    setImageSettings(`brightness(${brightness}%) contrast(${contrast}%) saturate(80%)`);
+
+    viewer.setFilterOptions({
+      filters: {
+        processors: OpenSeadragon.Filters.SATURATION(filterObj.target.value),
+        // processors: OpenSeadragon.Filters.INVERT()
+      },
+      loadMode: 'sync'
+    });
+
+    // setSaturation(filterObj.target.value);
+    // viewer.canvas.style.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
+    // setImageSettings(`brightness(${brightness}%) contrast(${contrast}%) saturate(80%)`);
   };
 
   const resetFilters = function () {
@@ -373,6 +403,11 @@ const SuspectedTileViewer = () => {
     setSaturation(100);
     // viewer.canvas.style.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
 
+  };
+
+  const filterStyle = {
+    // filter: `brightness(${red}%) contrast(${green}%) saturate(${blue}%)`
+    filter: `brightness(40%) contrast(200%) saturate(150%)`
   };
 
   return (
@@ -501,12 +536,13 @@ const SuspectedTileViewer = () => {
                         Brightness
                         <input
                           type="range"
-                          min="0"
-                          max="200"
+                          min="-255"
+                          max="255"
                           value={brightness}
                           onChange={updateFilterBrigtness}
                           tooltip="true"
                           class="form-range"
+                          step="1"
                         />
                       </label>
                       <label>
@@ -536,11 +572,12 @@ const SuspectedTileViewer = () => {
                         Saturation
                         <input
                           type="range"
-                          min="0"
-                          max="200"
+                          min="-100"
+                          max="100"
                           value={saturation}
                           onChange={updateFilterSaturation}
                           class="form-range"
+                          step="1"
                         />
                       </label>
 
@@ -561,7 +598,7 @@ const SuspectedTileViewer = () => {
               <NavItem eventKey="previousPatient" >
                 <NavIcon>
                   {/* <i src={homeIcon} className="fa fa-fw fa-home" style={{ fontSize: '1.75em' }} /> */}
-                  <img src={previousPatient} style={{ fontSize: '1rem', width: "2rem", color: "white" }} />
+                  <img src={previousPatient} style={{ fontSize: '1rem', width: "2rem", color: "white" }} className={filterStyle}/>
                 </NavIcon>
                 <NavText>
                   Previous Patient
@@ -620,7 +657,7 @@ const SuspectedTileViewer = () => {
             setShowDragonView(false);
           }}
         >
-          <DeepZoomViewer setViewer2={setViewer} imageSettings={imageSettings} ref={childRef} zoomLevel={zoomLevel} xCoord={xCoord} yCoord={yCoord} annotDetArr={annotArr}></DeepZoomViewer>
+          <DeepZoomViewer setViewer2={setViewer} imageSettings={imageSettings} ref={childRef} zoomLevel={zoomLevel} xCoord={xCoord} yCoord={yCoord} annotDetArr={annotArr} Doctor={Doctor} tileName={tileName}></DeepZoomViewer>
         </SlidingPane>
       </div>
 
