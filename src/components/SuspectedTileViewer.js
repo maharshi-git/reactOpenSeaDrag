@@ -74,6 +74,9 @@ const SuspectedTileViewer = () => {
 
   const [viewer, setViewer] = useState('')
 
+  const [widthTile, setWidthTile] = useState()
+  const [heightTile, setHeightTile] = useState()
+
   const cm = useRef(null);
 
   const items = [
@@ -177,6 +180,9 @@ const SuspectedTileViewer = () => {
 
         const annotDet = await response.json();
         // setData(data);
+
+        setWidthTile(annotDet.tileDeatil.width)
+        setHeightTile(annotDet.tileDeatil.height)
 
         let imagesArr = annotDet.Predicts.map(x => {
           return {
@@ -310,6 +316,9 @@ const SuspectedTileViewer = () => {
 
     setSelectedAnnotation(annotation)
     setShowDragonView(true)
+    // setZoomLevel(1);
+    // setXCoord(0);
+    // setYCoord(0);
     setZoomLevel(zoom);
     setXCoord(x);
     setYCoord(y);
@@ -657,7 +666,7 @@ const SuspectedTileViewer = () => {
             setShowDragonView(false);
           }}
         >
-          <DeepZoomViewer setViewer2={setViewer} imageSettings={imageSettings} ref={childRef} zoomLevel={zoomLevel} xCoord={xCoord} yCoord={yCoord} annotDetArr={annotArr} Doctor={Doctor} tileName={tileName}></DeepZoomViewer>
+          <DeepZoomViewer widthTile={widthTile} heightTile={heightTile} setViewer2={setViewer} imageSettings={imageSettings} ref={childRef} zoomLevel={zoomLevel} xCoord={xCoord} yCoord={yCoord} annotDetArr={annotArr} Doctor={Doctor} tileName={tileName}></DeepZoomViewer>
         </SlidingPane>
       </div>
 

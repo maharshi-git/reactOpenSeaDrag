@@ -10,10 +10,11 @@ import ShapeLabelsFormatter from "@recogito/annotorious-shape-labels";
 
 import './openseadragon-scalebar.js'
 import './openseadragon-svg-overlay.js'
+import './openseadragon-filtering.js'
 
 import { Row, Col } from "react-bootstrap";
 
-const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr, imageSettings, setViewer2 }) => {
+const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr, imageSettings, setViewer2, Doctor, tileName, widthTile, heightTile }) => {
   const viewerRef = useRef();
 
 
@@ -59,6 +60,17 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr, i
       showNavigator: true
 
     });
+
+    viewer.addHandler('tile-loaded', function () {
+
+      viewer.setFilterOptions({
+        filters: {
+          processors: OpenSeadragon.Filters.BRIGHTNESS(50),
+          // processors: OpenSeadragon.Filters.INVERT()
+        },
+        loadMode: 'sync'
+      });
+    })
 
     let ctrlPressed = false;
     window.addEventListener('keydown', function (event) {
@@ -131,7 +143,7 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr, i
         endAnchor.setAttribute('style', 'fill:rgb(255,0,0)');
         overlay.node().appendChild(endAnchor);
 
-        
+
 
         // Calculate the distance in viewport coordinates.
         const dx = viewportPoint.x - startPoint.x;
@@ -163,6 +175,8 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr, i
       event.preventDefaultAction = true;
     });
 
+   
+
     viewer.addHandler("open", function () {
 
       viewer.viewport.zoomTo(zoomLevel);
@@ -186,6 +200,13 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr, i
 
       let overlay = viewer.svgOverlay();
 
+      // viewer.setFilterOptions({
+      //   filters: {
+      //     processors: OpenSeadragon.Filters.BRIGHTNESS(50)
+      //   },
+      //   loadMode: 'sync'
+      // });
+
       // var button = document.createElement('button');
       // button.innerHTML = 'Click me';  // Set the button text
       // button.onclick = function () {
@@ -208,11 +229,14 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr, i
         return getTileUrl.apply(this, arguments) + "?v=" + "261d9b83";
       };
 
-      viewer.canvas.style.filter = imageSettings;
+      // viewer.canvas.style.filter = imageSettings;
+
 
     });
 
-    let image = { "Image": { "Format": "jpeg", "Overlap": 1, "Size": { "Height": 61440, "Width": 60928 }, "TileSize": 510, "Url": "http://127.0.0.1:5000/tile/", "xmlns": "http://schemas.microsoft.com/deepzoom/2008" }, "crossOriginPolicy": false, "ajaxWithCredentials": false, "useCanvas": true }
+    let image = { "Image": { "Format": "jpeg", "Overlap": 1, "Size": { "Height": widthTile, "Width":heightTile  }, "TileSize": 512, "Url": `http://127.0.0.1:5000/tile/${Doctor}/${tileName}/`, "xmlns": "http://schemas.microsoft.com/deepzoom/2008" }, "crossOriginPolicy": 'Anonymous', "ajaxWithCredentials": false, "useCanvas": true }
+    // let image = { "Image": { "Format": "jpeg", "Overlap": 1, "Size": { "Height": 61440, "Width":60928  }, "TileSize": 512, "Url": `http://127.0.0.1:5000/tile/${Doctor}/${tileName}/`, "xmlns": "http://schemas.microsoft.com/deepzoom/2008" }, "crossOriginPolicy": 'Anonymous', "ajaxWithCredentials": false, "useCanvas": true }
+    // let image = { "Image": { "Format": "jpeg", "Overlap": 1 , "Size": { "Height": 79360, "Width":75264  }, "TileSize": 512, "Url": `http://127.0.0.1:5000/tile/${Doctor}/${tileName}/`, "xmlns": "http://schemas.microsoft.com/deepzoom/2008" }, "crossOriginPolicy": 'Anonymous', "ajaxWithCredentials": false, "useCanvas": true }
 
 
     const anno = Annotorious(viewer);
