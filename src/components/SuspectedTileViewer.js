@@ -12,6 +12,8 @@ import previousPatient from '../resources/icons/back.png'
 import measureIcon from '../resources/icons/measure.png'
 import imageEdit from '../resources/icons/eye.png'
 
+import util from '../util/datamanager'
+
 
 // import { Modal } from 'react-bootstrap';
 import DeepZoomViewer from "./DeepZoomViewer";
@@ -35,7 +37,7 @@ import '@trendmicro/react-sidenav/dist/react-sidenav.css'
 const SuspectedTileViewer = () => {
   //api call to get coordinates of selected file from the server
 
-  const {Doctor, tileName} = useParams();
+  const { Doctor, tileName } = useParams();
 
   const childRef = useRef();
 
@@ -129,129 +131,68 @@ const SuspectedTileViewer = () => {
 
     });
 
+    const setupScreen = async () => {
 
-    const fetchData = async (pathT) => {
-      const path = `http://localhost:5000/${pathT}`; // Replace with your API path
-      const method = 'GET'; // Replace with your method
-      const body = {}; // Replace with your body
+      let annotDet = await util.fetchData(`tileSlide/${Doctor}/${tileName}`, 'GET', 'application/json')
 
-      return new Promise((resolve, reject) => {
-        fetch(path, {
-          method: method,
-          headers: {
-            'Content-Type': 'image/jpeg'
-          }
-        })
+      setWidthTile(annotDet.tileDeatil.width)
+      setHeightTile(annotDet.tileDeatil.height)
 
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response;
-          })
-          .then((data) => {
-            resolve(data);
-          })
-          .catch((error) => {
-            console.error('There was a problem with the fetch operation: ', error);
-            reject(error);
-          });
-      });
-    }
-
-
-
-    const fetchDataAnnotation = async () => {
-      const path = `http://localhost:5000/tileSlide/${Doctor}/${tileName}`; // Replace with your API path
-      const method = 'GET'; // Replace with your method
-      const body = {}; // Replace with your body
-
-      try {
-        const response = await fetch(path, {
-          method: method,
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+      let imagesArr = annotDet.Predicts.map(x => {
+        return {
+          id: x.id,
+          src: `http://localhost:5000/get_image/${Doctor}/${tileName}/${x.id}`,
+          alt: x.title,
+          zoom: 64,
+          x: x.openSeaXCoord,
+          y: x.openSeaYCoord,
+          annotation: x.title,
+          cat: x.cat,
+          title: x.title
         }
 
-        const annotDet = await response.json();
-        // setData(data);
-
-        setWidthTile(annotDet.tileDeatil.width)
-        setHeightTile(annotDet.tileDeatil.height)
-
-        let imagesArr = annotDet.Predicts.map(x => {
-          return {
-            id: x.id,
-            src: `http://localhost:5000/get_image/${Doctor}/${tileName}/${x.id}`,
-            alt: x.title,
-            zoom: 64,
-            x: x.openSeaXCoord,
-            y: x.openSeaYCoord,
-            annotation: x.title,
-            cat: x.cat,
-            title: x.title
-          }
-
-        })
+      })
 
 
-        let annotDetArr = annotDet.Predicts.map(x => {
-          return {
-            xywh: `xywh=pixel:${x.x1},${x.y1},${x.x2 - x.x1},${x.y2 - x.y1}`,
-            id: x.id,
-            title: x.title,
-            cat: x.cat
-          }
-        })
-
-        setAnnotArr(annotDetArr);
-
-        let Images20, newImgArr = [], newImgArr2;
-        let noCalls = Math.floor(imagesArr.length / 12);
-        for (var i = 0; i < noCalls; i++) {
-
-          Images20 = imagesArr.slice(i * 12, (i + 1) * 12);
-
-          let listImages = await Promise.all(Images20.map(images =>
-            fetchData(`get_image/${Doctor}/${tileName}/${images.id}`)
-              .then(response => response.blob())
-              .then(blob => URL.createObjectURL(blob))
-          )
-          );
-
-          Images20.forEach((x, index) => {
-
-            x.src2 = listImages[index]
-
-          })
-
-          newImgArr = [...newImgArr, ...Images20]
-
-          setImages(newImgArr)
+      let annotDetArr = annotDet.Predicts.map(x => {
+        return {
+          xywh: `xywh=pixel:${x.x1},${x.y1},${x.x2 - x.x1},${x.y2 - x.y1}`,
+          id: x.id,
+          title: x.title,
+          cat: x.cat
         }
+      })
 
+      setAnnotArr(annotDetArr);
 
-        // console.log(annotDet);
-        // setAnnotArrNDPI(annotDet.Predicts);
+      let Images20, newImgArr = [], newImgArr2;
+      let noCalls = Math.floor(imagesArr.length / 12);
+      for (var i = 0; i < noCalls; i++) {
 
+        Images20 = imagesArr.slice(i * 12, (i + 1) * 12);
 
+        let listImages = await Promise.all(Images20.map(images =>
+          util.fetchData(`get_image/${Doctor}/${tileName}/${images.id}`, 'GET', 'image/jpeg')
+            .then(response => response.blob())
+            .then(blob => URL.createObjectURL(blob))
+        )
+        );
 
-      } catch (error) {
-        console.error('There was a problem with the fetch operation: ', error);
+        Images20.forEach((x, index) => {
+
+          x.src2 = listImages[index]
+
+        })
+
+        newImgArr = [...newImgArr, ...Images20]
+
+        setImages(newImgArr)
       }
+
     }
 
+    setupScreen()
 
-    fetchDataAnnotation();
-
-    // return () => {
-    //   window.removeEventListener('keydown', handleKeyDown);
-    // };
   }, []);
 
   const onRightClick = (event, id) => {
@@ -260,36 +201,6 @@ const SuspectedTileViewer = () => {
       cm.current.show(event);
     }
   };
-
-
-  const fetchData = async (pathT) => {
-    const path = `http://localhost:5000/${pathT}`; // Replace with your API path
-    const method = 'GET'; // Replace with your method
-    const body = {}; // Replace with your body
-
-    return new Promise((resolve, reject) => {
-      fetch(path, {
-        method: method,
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      })
-
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          return response;
-        })
-        .then((data) => {
-          resolve(data);
-        })
-        .catch((error) => {
-          console.error('There was a problem with the fetch operation: ', error);
-          reject(error);
-        });
-    });
-  }
 
   const handleMenuCategory = (cat, id) => {
 
@@ -304,7 +215,7 @@ const SuspectedTileViewer = () => {
     setImages([...images]);
     currentItems.find(x => x.id === id).cat = newCat;
 
-    fetchData(`updateCategory/${id}/${newCat}`)
+    util.fetchData(`updateCategory/${Doctor}/${tileName}/${id}/${newCat}`, 'GET', 'application/json')
 
   }
 
@@ -607,7 +518,7 @@ const SuspectedTileViewer = () => {
               <NavItem eventKey="previousPatient" >
                 <NavIcon>
                   {/* <i src={homeIcon} className="fa fa-fw fa-home" style={{ fontSize: '1.75em' }} /> */}
-                  <img src={previousPatient} style={{ fontSize: '1rem', width: "2rem", color: "white" }} className={filterStyle}/>
+                  <img src={previousPatient} style={{ fontSize: '1rem', width: "2rem", color: "white" }} className={filterStyle} />
                 </NavIcon>
                 <NavText>
                   Previous Patient
