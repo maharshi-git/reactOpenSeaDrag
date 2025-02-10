@@ -42,8 +42,8 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr, i
 
     const viewer = OpenSeadragon({
       id: "viewer",
-      prefixUrl:
-        "https://cdn.jsdelivr.net/npm/openseadragon@4.1/build/openseadragon/images/",
+      // prefixUrl:
+      //   "https://cdn.jsdelivr.net/npm/openseadragon@4.1/build/openseadragon/images/",
       //   tileSources: tileSources,
       animationTime: 0.5,
       blendTime: 0.1,
@@ -236,6 +236,7 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr, i
     
     
     let image = { "Image": { "Format": "jpeg", "Overlap": 1, "Size": { "Height": heightTile, "Width":  widthTile}, "TileSize": 512, "Url": `http://127.0.0.1:5000/tile/${Doctor}/${tileName}/`, "xmlns": "http://schemas.microsoft.com/deepzoom/2008" }, "crossOriginPolicy": 'Anonymous', "ajaxWithCredentials": false, "useCanvas": true }
+    // let image = { "Image": { "Format": "jpeg", "Overlap": 1, "Size": { "Height": heightTile, "Width":  widthTile}, "TileSize": 512, "Url": `http://127.0.0.1:8000/api/open-slide/`, "xmlns": "http://schemas.microsoft.com/deepzoom/2008" }, "crossOriginPolicy": 'Anonymous', "ajaxWithCredentials": false, "useCanvas": true }
     // let image = { "Image": { "Format": "jpeg", "Overlap": 1, "Size": { "Height": 61440, "Width":60928  }, "TileSize": 512, "Url": `http://127.0.0.1:5000/tile/${Doctor}/${tileName}/`, "xmlns": "http://schemas.microsoft.com/deepzoom/2008" }, "crossOriginPolicy": 'Anonymous', "ajaxWithCredentials": false, "useCanvas": true }
     // let image = { "Image": { "Format": "jpeg", "Overlap": 1 , "Size": { "Height": 79360, "Width":75264  }, "TileSize": 512, "Url": `http://127.0.0.1:5000/tile/${Doctor}/${tileName}/`, "xmlns": "http://schemas.microsoft.com/deepzoom/2008" }, "crossOriginPolicy": 'Anonymous', "ajaxWithCredentials": false, "useCanvas": true }
 
@@ -323,7 +324,8 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr, i
 
     setViewer(viewer);
 
-  }, [tileSources]);
+  // }, [tileSources]);
+  }, []);
 
   const getSavedAnnotation = async () => {
     let savedData = await onFetchData('http://127.0.0.1:5000/getSavedAnnotation', 'GET',)

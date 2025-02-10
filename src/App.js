@@ -8,6 +8,9 @@ import FileViewer from "./components/FileViewer";
 
 import ReactGallery from "./components/ReactGallery";
 
+// import OmeroLogin from "./components/OMEROLogin";
+import ParentComponent from "./components/ParentComponent";
+
 
 import "./App.css";
 
@@ -18,6 +21,10 @@ function App() {
   const [doctorAndReport, setDoctorAndReport] = useState([])
 
   useEffect(() => {
+
+    // window.open('http://104.154.195.80/webclient/login/?url=%2Fwebclient%2F', '_blank', 'noopener,noreferrer')
+
+    // window.location.href = 'http://104.154.195.80/webclient/login/?url=%2Fwebclient%2F';
 
     const fetchData = async (pathT) => {
       const path = `http://localhost:5000/${pathT}`; // Replace with your API path
@@ -73,7 +80,8 @@ function App() {
           <Routes>
             <Route path="/" element={<FileViewer doctorData={doctorAndReport} />} />
             <Route path="/about/:Doctor/:tileName" element={<SuspectedTileViewer doctorData={doctorAndReport} />} />
-            {/* <Route path="/gal" element={<ReactGallery doctorData={doctorAndReport}/>} /> */}
+            <Route path="/gal" element={<ReactGallery doctorData={doctorAndReport}/>} />
+           {/* <Route path="/OMEROLogin" element={<OmeroLogin/>} />  */}
 
           </Routes>
         </BrowserRouter>

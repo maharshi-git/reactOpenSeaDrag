@@ -14,6 +14,13 @@ import imageEdit from '../resources/icons/eye.png'
 
 import util from '../util/datamanager'
 
+import FreqIntGraph from "./FreqIntGraph";
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogTitle from '@mui/material/DialogTitle';
+import Button from '@mui/material/Button';
+
 
 // import { Modal } from 'react-bootstrap';
 import DeepZoomViewer from "./DeepZoomViewer";
@@ -79,6 +86,10 @@ const SuspectedTileViewer = () => {
   const [widthTile, setWidthTile] = useState()
   const [heightTile, setHeightTile] = useState()
 
+  const [RGBGraph, setRGBGraph] = useState(false)
+
+  const [sliderValue, setSliderValue] = useState([20, 80]);
+
   const cm = useRef(null);
 
   const items = [
@@ -142,6 +153,7 @@ const SuspectedTileViewer = () => {
         return {
           id: x.id,
           src: `http://localhost:5000/get_image/${Doctor}/${tileName}/${x.id}`,
+          // src: `http://127.0.0.1:8000/api/open-slide`,
           alt: x.title,
           zoom: 64,
           x: x.openSeaXCoord,
@@ -330,8 +342,27 @@ const SuspectedTileViewer = () => {
     filter: `brightness(40%) contrast(200%) saturate(150%)`
   };
 
+  const onClose = () => {
+    setRGBGraph(false)
+  }
+
+  const handleSliderChange = (newValue) => {
+    setSliderValue(newValue);
+    console.log(`Slider values: ${newValue}`);
+};
+
   return (
     <div>
+
+      <Dialog open={RGBGraph} onClose={onClose} fullWidth maxWidth="md">
+        <DialogTitle>Frequency Intensity Graph</DialogTitle>
+        <DialogContent>
+          <FreqIntGraph min={0} max={255} step={1} onChange={handleSliderChange} />
+        </DialogContent>
+        <DialogActions>
+          {/* <Button onClick={onClose}>Close</Button> */}
+        </DialogActions>
+      </Dialog>
 
       {/* <Draggable >
         <div className="dialogBox" style={{position: "absolute", top: "50%", zIndex:"1000", transform: "translate(-50%, -50%)"}}>
@@ -501,6 +532,31 @@ const SuspectedTileViewer = () => {
                         />
                       </label>
 
+
+                    </div>
+                  </NavText>
+                </NavItem>
+              </NavItem>
+              <NavItem active={false} eventKey="changeImage" onClick={() => { setRGBGraph(true) }}>
+                <NavIcon>
+                  {/* <i src={homeIcon} className="fa fa-fw fa-home" style={{ fontSize: '1.75em' }} /> */}
+                  <img src={imageEdit} style={{ fontSize: '1rem', width: "2rem", color: "white" }} />
+                </NavIcon>
+                <NavItem>
+                  <NavText>
+                    <div
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        marginLeft: "0.8rem",
+                        width: "20rem",
+                        height: "20rem",
+                        overflowY: "auto", // Add this line to make the div scrollable
+                        overflowX: "hidden" // Optional: hide horizontal scrollbar if not needed
+                      }}
+                    >
+
+                      <FreqIntGraph min={0} max={255} step={1} onChange={handleSliderChange}></FreqIntGraph>
 
                     </div>
                   </NavText>
