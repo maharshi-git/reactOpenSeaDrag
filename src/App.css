@@ -29,7 +29,8 @@
 }
 
 .highlight {
-  background-color: rgba(255, 0, 0, 0.5); /* semi-transparent red */
+  background-color: rgba(255, 0, 0, 0.5);
+  /* semi-transparent red */
   border: 2px solid red;
 }
 
@@ -43,6 +44,7 @@
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -54,11 +56,11 @@
   padding: 20px 0;
 
   position: fixed;
-    bottom: 0;
-    width: 100%;
-    display: flex;
-   
-    background-color: white;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+
+  background-color: white;
 }
 
 .pagination .active {
@@ -75,7 +77,8 @@
   cursor: pointer;
 }
 
-.pagination .previous, .pagination .next {
+.pagination .previous,
+.pagination .next {
   margin: 0 10px;
   cursor: pointer;
 }
@@ -83,14 +86,16 @@
 .image-grid img {
   cursor: pointer;
 }
-.imageBtn{
+
+.imageBtn {
   cursor: pointer;
 }
 
 .image-grid-scale img {
   cursor: crosshair;
 }
-.imageBtnScale{
+
+.imageBtnScale {
   cursor: crosshair;
 }
 
@@ -135,57 +140,67 @@
   /* display: grid;
   grid-template-columns: repeat(4, 1fr);
   grid-template-rows: repeat(3, 1fr); */
-  height: 100vh; /* Fill the entire screen */
-  width: 100vw; /* Fill the entire screen */
-  gap: 10px; /* Optional: add some gap between the grid items */
+  /* height: 100vh; Fill the entire screen */
+  height: 100vh;
+  width: calc(100vw - 70px);
+  /* Fill the entire screen */
+  gap: 10px;
+  /* Optional: add some gap between the grid items */
+  overflow: hidden;
 }
 
 .grid-item {
-  background-color: #000000; /* Optional: add a background color to see the grid items */
+  background-color: #000000;
+  /* Optional: add a background color to see the grid items */
   overflow: hidden;
-  
+
 }
-.grid-item img{
+
+.grid-item img {
   max-width: 100%;
   max-height: 100%;
-  display: block; /* Ensure the image is a block element */
-  margin: auto; /* Center the image in its container */
+  display: block;
+  /* Ensure the image is a block element */
+  margin: auto;
+  /* Center the image in its container */
   object-fit: contain;
-  
+
 }
 
 .p-contextmenu .p-menuitem-link {
-    color: #333;
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    padding: .5em .75em;
-    cursor: pointer;
-    min-height: 1em;
-    overflow: hidden;
-    position: relative;
-    background-color: #f4f4f4;
-    border: none
+  color: #333;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  padding: .5em .75em;
+  cursor: pointer;
+  min-height: 1em;
+  overflow: hidden;
+  position: relative;
+  background-color: #f4f4f4;
+  border: none
 }
 
 .p-contextmenu .p-menuitem-link:hover {
-    background: #f4f4f4;
-    color: #1976d2;
+  background: #f4f4f4;
+  color: #1976d2;
 }
 
 .p-contextmenu .p-menuitem-text {
-    margin: 0 .5em 0 .5em;
+  margin: 0 .5em 0 .5em;
 }
+
 canvas {
   border: 1px solid black;
 }
 
-.fullScreenSlidePane{
+.fullScreenSlidePane {
   width: 94% ! important
 }
-.slide-pane__content{
-padding: 5px;
-height: 100%
+
+.slide-pane__content {
+  padding: 5px;
+  height: 100%
 }
 
 .graph-container {
@@ -196,6 +211,7 @@ height: 100%
   margin-top: 20px;
 }
 
-.graph-container > div {
-  width: 30%; /* Adjust width to fit three graphs in a row */
+.graph-container>div {
+  width: 30%;
+  /* Adjust width to fit three graphs in a row */
 }

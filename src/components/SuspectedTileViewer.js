@@ -59,6 +59,7 @@ const SuspectedTileViewer = () => {
   const [selectedAnnotaiton, setSelectedAnnotation] = useState(null);
 
   const [images, setImages] = useState([])
+  const [totalImagesCount, setTotalImagesCount] = useState(0);
 
   const [gridx, setGridx] = useState(4);
   const [gridy, setGridy] = useState(3);
@@ -76,8 +77,8 @@ const SuspectedTileViewer = () => {
 
   const [gamma, setGamma] = useState(1);
   const [contrast, setContrast] = useState(100);
-  const [brightness, setBrightness] = useState(50);
-  const [saturation, setSaturation] = useState(80);
+  const [brightness, setBrightness] = useState(100);
+  const [saturation, setSaturation] = useState(100);
 
   const [imageSettings, setImageSettings] = useState(`brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`)
 
@@ -152,7 +153,7 @@ const SuspectedTileViewer = () => {
       let imagesArr = annotDet.Predicts.map(x => {
         return {
           id: x.id,
-          src: `http://localhost:5000/get_image/${Doctor}/${tileName}/${x.id}`,
+          src: `http://localhost:3001/get_image/${Doctor}/${tileName}/${x.id}`,
           // src: `http://127.0.0.1:8000/api/open-slide`,
           alt: x.title,
           zoom: 64,
@@ -162,8 +163,9 @@ const SuspectedTileViewer = () => {
           cat: x.cat,
           title: x.title
         }
-
       })
+
+      setTotalImagesCount(imagesArr.length);
 
 
       let annotDetArr = annotDet.Predicts.map(x => {
@@ -290,52 +292,27 @@ const SuspectedTileViewer = () => {
   }
 
   const updateFilterBrigtness = (filterObj) => {
-    setBrightness(filterObj.target.value);
-
-    viewer.setFilterOptions({
-      filters: {
-        processors: OpenSeadragon.Filters.BRIGHTNESS(filterObj.target.value),
-        // processors: OpenSeadragon.Filters.INVERT()
-      },
-      loadMode: 'sync'
-    });
-
-    // setImageSettings(`brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`);
-    // viewer.canvas.style.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
+    const val = filterObj.target.value;
+    setBrightness(val);
+    setImageSettings(`brightness(${val}%) contrast(${contrast}%) saturate(${saturation}%)`);
   };
   const updateFilterContrast = (filterObj) => {
-    setContrast(filterObj.target.value);
-    viewer.canvas.style.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
-    setImageSettings(`brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`);
+    const val = filterObj.target.value;
+    setContrast(val);
+    setImageSettings(`brightness(${brightness}%) contrast(${val}%) saturate(${saturation}%)`);
   };
-  const updateFilterGamma = (filterObj) => {
-    setGamma(filterObj.target.value);
 
-    viewer.setFilterOptions({
-      filters: {
-        processors: OpenSeadragon.Filters.GAMMA(filterObj.target.value),
-        // processors: OpenSeadragon.Filters.INVERT()
-      },
-      loadMode: 'sync'
-    });
-    // viewer.canvas.style.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
-    // setImageSettings(`brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`);
+  const updateFilterGamma = (filterObj) => {
+    // Gamma not supported in standard CSS filters, ignoring for now or mapping if possible
+    // Keeping state but not applying to filter string
+    setGamma(filterObj.target.value);
   };
 
   //write a similart method for saturation
   const updateFilterSaturation = (filterObj) => {
-
-    viewer.setFilterOptions({
-      filters: {
-        processors: OpenSeadragon.Filters.SATURATION(filterObj.target.value),
-        // processors: OpenSeadragon.Filters.INVERT()
-      },
-      loadMode: 'sync'
-    });
-
-    // setSaturation(filterObj.target.value);
-    // viewer.canvas.style.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
-    // setImageSettings(`brightness(${brightness}%) contrast(${contrast}%) saturate(80%)`);
+    const val = filterObj.target.value;
+    setSaturation(val);
+    setImageSettings(`brightness(${brightness}%) contrast(${contrast}%) saturate(${val}%)`);
   };
 
   const resetFilters = function () {
@@ -343,8 +320,7 @@ const SuspectedTileViewer = () => {
     setContrast(100);
     setGamma(1);
     setSaturation(100);
-    // viewer.canvas.style.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
-
+    setImageSettings(`brightness(100%) contrast(100%) saturate(100%)`);
   };
 
   const filterStyle = {
@@ -392,219 +368,206 @@ const SuspectedTileViewer = () => {
             <SideNav.Nav defaultSelected="fullScreen">
               <NavItem eventKey="home" onClick={(event) => toggleFullScreen(event)}>
                 <NavIcon>
-
                   <img src={fullScreenIcon} style={{ fontSize: '1rem', width: "2rem", color: "white" }} />
                 </NavIcon>
                 <NavText>
                   Home
                 </NavText>
               </NavItem>
-
-              <NavItem eventKey="changeDimension">
-                <NavIcon>
-
-                  <img src={gridIcon} style={{ fontSize: '1rem', width: "2rem", color: "white" }} />
-                </NavIcon>
-                <NavText>
-                  Adjust Dimension
-                </NavText>
-                <NavItem eventKey="charts/linechart">
-                  <NavText>
-                    <input
-                      type="number"
-                      value={gridx}
-                      onChange={(event) => {
-                        const newGridx = Number(event.target.value);
-                        if (newGridx === 0) {
-                          setGridx("")
-                          return;
-                        }
-                        setGridx(newGridx);
-                        setItemsPerPage(newGridx * gridy);
-                      }}
-                      style={{ height: "1rem" }}
-                    />
-                    <input
-                      type="number"
-                      value={gridy}
-                      onChange={(event) => {
-                        const newGridy = Number(event.target.value);
-                        if (newGridy === 0) {
-                          setGridy("")
-                          return;
-                        }
-                        setGridy(newGridy);
-                        setItemsPerPage(gridx * newGridy);
-                      }}
-                      style={{ height: "1rem" }}
-                    />
-
-                  </NavText>
-                </NavItem>
-
-              </NavItem>
-              <NavItem eventKey="nextPage" >
-                <NavIcon>
-                  {/* <i src={homeIcon} className="fa fa-fw fa-home" style={{ fontSize: '1.75em' }} /> */}
-                  <img onClick={() => handlePageClick(currentPage + 1)} src={nextIcon} style={{ fontSize: '1rem', width: "2rem", color: "white" }}>
-
-                  </img>
-                  {/* <div style={{position: "absolute", top: "10px", left: "10px", color: "white", background: "rgba(0, 0, 0, 0.5)", padding: "5px"}}>
-                    Your Title Here
-                  </div> */}
-                </NavIcon>
-                <NavText>
-                  Next Page
-                </NavText>
-              </NavItem>
-              <NavItem eventKey="previousPage" onClick={() => handlePageClick(currentPage - 1)}>
-                <NavIcon>
-                  {/* <i src={homeIcon} className="fa fa-fw fa-home" style={{ fontSize: '1.75em' }} /> */}
-                  <img src={prevIcon} style={{ fontSize: '1rem', width: "2rem", color: "white" }} />
-                </NavIcon>
-                <NavText>
-                  Previous Page
-                </NavText>
-              </NavItem>
-              <NavItem active={false} eventKey="measure" onClick={() => { setScaleSelected(!scaleSelected); }}>
-                <NavIcon>
-                  {/* <i src={homeIcon} className="fa fa-fw fa-home" style={{ fontSize: '1.75em' }} /> */}
-                  <img src={measureIcon} style={{ fontSize: '1rem', width: "2rem", color: "white" }} />
-                </NavIcon>
-                <NavText>
-                  Enable Measure
-                </NavText>
-              </NavItem>
-              <NavItem active={false} eventKey="changeImage" onClick={() => { setScaleSelected(!scaleSelected); }}>
-                <NavIcon>
-                  {/* <i src={homeIcon} className="fa fa-fw fa-home" style={{ fontSize: '1.75em' }} /> */}
-                  <img src={imageEdit} style={{ fontSize: '1rem', width: "2rem", color: "white" }} />
-                </NavIcon>
-                <NavItem>
-                  <NavText>
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        marginLeft: "0.8rem",
-                        width: "200px",
-                      }}
-                    >
-                      <button className="btn btn-primary" onClick={resetFilters}>
-                        Reset
-                      </button>
-                      <label>
-                        Brightness
+              {!showDragonView && (
+                <>
+                  <NavItem eventKey="changeDimension">
+                    <NavIcon>
+                      <img src={gridIcon} style={{ fontSize: '1rem', width: "2rem", color: "white" }} />
+                    </NavIcon>
+                    <NavText>
+                      Adjust Dimension
+                    </NavText>
+                    <NavItem eventKey="charts/linechart">
+                      <NavText>
                         <input
-                          type="range"
-                          min="-255"
-                          max="255"
-                          value={brightness}
-                          onChange={updateFilterBrigtness}
-                          tooltip="true"
-                          class="form-range"
-                          step="1"
+                          type="number"
+                          value={gridx}
+                          onChange={(event) => {
+                            const newGridx = Number(event.target.value);
+                            if (newGridx === 0) {
+                              setGridx("")
+                              return;
+                            }
+                            setGridx(newGridx);
+                            setItemsPerPage(newGridx * gridy);
+                          }}
+                          style={{ height: "1rem" }}
                         />
-                      </label>
-                      <label>
-                        Contrast
                         <input
-                          type="range"
-                          min="0"
-                          max="200"
-                          value={contrast}
-                          onChange={updateFilterContrast}
-                          class="form-range"
+                          type="number"
+                          value={gridy}
+                          onChange={(event) => {
+                            const newGridy = Number(event.target.value);
+                            if (newGridy === 0) {
+                              setGridy("")
+                              return;
+                            }
+                            setGridy(newGridy);
+                            setItemsPerPage(gridx * newGridy);
+                          }}
+                          style={{ height: "1rem" }}
                         />
-                      </label>
-                      <label>
-                        Gamma
-                        <input
-                          type="range"
-                          min="0"
-                          max="5"
-                          step="0.1"
-                          value={gamma}
-                          onChange={updateFilterGamma}
-                          class="form-range"
-                        />
-                      </label>
-                      <label>
-                        Saturation
-                        <input
-                          type="range"
-                          min="-100"
-                          max="100"
-                          value={saturation}
-                          onChange={updateFilterSaturation}
-                          class="form-range"
-                          step="1"
-                        />
-                      </label>
+                      </NavText>
+                    </NavItem>
+                  </NavItem>
+                  <NavItem eventKey="nextPage" disabled={currentPage >= Math.ceil(images.length / itemsPerPage)}>
+                    <NavIcon>
+                      <img
+                        onClick={() => {
+                          if (currentPage < Math.ceil(images.length / itemsPerPage)) {
+                            handlePageClick(currentPage + 1);
+                          }
+                        }}
+                        src={nextIcon}
+                        style={{
+                          fontSize: '1rem',
+                          width: "2rem",
+                          color: "white",
+                          opacity: currentPage >= Math.ceil(images.length / itemsPerPage) ? 0.5 : 1,
+                          cursor: currentPage >= Math.ceil(images.length / itemsPerPage) ? 'not-allowed' : 'pointer'
+                        }}
+                      />
+                    </NavIcon>
+                    <NavText>
+                      Next Page
+                    </NavText>
+                  </NavItem>
+                  <NavItem eventKey="previousPage" onClick={() => handlePageClick(currentPage - 1)}>
+                    <NavIcon>
+                      <img src={prevIcon} style={{ fontSize: '1rem', width: "2rem", color: "white" }} />
+                    </NavIcon>
+                    <NavText>
+                      Previous Page
+                    </NavText>
+                  </NavItem>
+                  <NavItem eventKey="nextPatient" >
+                    <NavIcon>
+                      <img src={nextPatient} style={{ fontSize: '1rem', width: "2rem", color: "white" }} />
+                    </NavIcon>
+                    <NavText>
+                      Next Patient
+                    </NavText>
+                  </NavItem>
+                  <NavItem eventKey="previousPatient" >
+                    <NavIcon>
+                      <img src={previousPatient} style={{ fontSize: '1rem', width: "2rem", color: "white" }} className={filterStyle} />
+                    </NavIcon>
+                    <NavText>
+                      Previous Patient
+                    </NavText>
+                  </NavItem>
 
+                  <NavItem eventKey="pageStats" style={{ pointerEvents: 'none' }}>
+                    <NavText style={{ paddingLeft: '10px', color: '#ccc', fontSize: '0.8em', lineHeight: '1.4' }}>
+                      <div style={{ marginTop: '10px' }}>total: {Math.ceil(totalImagesCount / itemsPerPage) || 1}</div>
+                      <div>current: {currentPage}</div>
+                      <div>loaded: {Math.ceil(images.length / itemsPerPage)}</div>
+                    </NavText>
+                  </NavItem>
 
-                    </div>
-                  </NavText>
-                </NavItem>
-              </NavItem>
-              <NavItem active={false} eventKey="changeImage" onClick={() => { setRGBGraph(true) }}>
-                <NavIcon>
-                  {/* <i src={homeIcon} className="fa fa-fw fa-home" style={{ fontSize: '1.75em' }} /> */}
-                  <img src={imageEdit} style={{ fontSize: '1rem', width: "2rem", color: "white" }} />
-                </NavIcon>
-                <NavItem>
-                  <NavText>
-                    <div
-                      style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        marginLeft: "0.8rem",
-                        width: "20rem",
-                        height: "20rem",
-                        overflowY: "auto", // Add this line to make the div scrollable
-                        overflowX: "hidden" // Optional: hide horizontal scrollbar if not needed
-                      }}
-                    >
+                </>
+              )}
 
-                      <FreqIntGraph min={0} max={255} step={1} onChange={handleSliderChange}></FreqIntGraph>
-
-                    </div>
-                  </NavText>
-                </NavItem>
-              </NavItem>
-              <NavItem eventKey="nextPatient" >
-                <NavIcon>
-                  {/* <i src={homeIcon} className="fa fa-fw fa-home" style={{ fontSize: '1.75em' }} /> */}
-                  <img src={nextPatient} style={{ fontSize: '1rem', width: "2rem", color: "white" }} />
-                </NavIcon>
-                <NavText>
-                  Next Patient
-                </NavText>
-              </NavItem>
-              <NavItem eventKey="previousPatient" >
-                <NavIcon>
-                  {/* <i src={homeIcon} className="fa fa-fw fa-home" style={{ fontSize: '1.75em' }} /> */}
-                  <img src={previousPatient} style={{ fontSize: '1rem', width: "2rem", color: "white" }} className={filterStyle} />
-                </NavIcon>
-                <NavText>
-                  Previous Patient
-                </NavText>
-              </NavItem>
-
-
-              <NavItem eventKey="changeDimension">
-
-                <NavText style={{ marginLeft: "0.7rem" }}>
-                  {currentPage}/{Math.ceil(images.length / itemsPerPage)}
-                </NavText>
-                <NavItem eventKey="charts/linechart">
-                  <NavText>
-                    <input onKeyDown={(event) => {
-                      setCurrentPage(event.target.value)
-                    }} style={{ height: "1rem" }}></input>
-                  </NavText>
-                </NavItem>
-              </NavItem>
+              {showDragonView && (
+                <>
+                  <NavItem active={scaleSelected} eventKey="measure" onClick={() => { setScaleSelected(!scaleSelected); }}>
+                    <NavIcon>
+                      <img src={measureIcon} style={{ fontSize: '1rem', width: "2rem", color: "white", backgroundColor: scaleSelected ? "rgba(255,255,255,0.3)" : "transparent" }} />
+                    </NavIcon>
+                    <NavText>
+                      Enable Measure
+                    </NavText>
+                  </NavItem>
+                  <NavItem active={false} eventKey="changeImage" onClick={() => { }}>
+                    <NavIcon>
+                      <img src={imageEdit} style={{ fontSize: '1rem', width: "2rem", color: "white" }} />
+                    </NavIcon>
+                    <NavItem>
+                      <NavText>
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            marginLeft: "0.8rem",
+                            width: "200px",
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                          onMouseDown={(e) => e.stopPropagation()}
+                          onMouseUp={(e) => e.stopPropagation()}
+                        >
+                          <button className="btn btn-primary" onClick={resetFilters}>
+                            Reset
+                          </button>
+                          <label>
+                            Brightness
+                            <input
+                              type="range"
+                              min="0"
+                              max="200"
+                              value={brightness}
+                              onChange={updateFilterBrigtness}
+                              className="form-range"
+                              step="1"
+                            />
+                          </label>
+                          <label>
+                            Contrast
+                            <input
+                              type="range"
+                              min="0"
+                              max="200"
+                              value={contrast}
+                              onChange={updateFilterContrast}
+                              className="form-range"
+                            />
+                          </label>
+                          <label>
+                            Saturation
+                            <input
+                              type="range"
+                              min="0"
+                              max="200"
+                              value={saturation}
+                              onChange={updateFilterSaturation}
+                              className="form-range"
+                              step="1"
+                            />
+                          </label>
+                        </div>
+                      </NavText>
+                    </NavItem>
+                  </NavItem>
+                  <NavItem active={false} eventKey="graphs" onClick={() => { setRGBGraph(true) }}>
+                    <NavIcon>
+                      {/* Using a graph-like icon or reusing eye if requested, but user said 'graph' */}
+                      <img src={imageEdit} style={{ fontSize: '1rem', width: "2rem", color: "white" }} />
+                    </NavIcon>
+                    <NavItem>
+                      <NavText>
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            marginLeft: "0.8rem",
+                            width: "20rem",
+                            height: "20rem",
+                            overflowY: "auto",
+                            overflowX: "hidden"
+                          }}
+                        >
+                          <FreqIntGraph min={0} max={255} step={1} onChange={handleSliderChange}></FreqIntGraph>
+                        </div>
+                      </NavText>
+                    </NavItem>
+                  </NavItem>
+                </>
+              )}
             </SideNav.Nav>
           </SideNav>
         </div>
@@ -643,9 +606,9 @@ const SuspectedTileViewer = () => {
             setShowDragonView(false);
           }}
         >
-          <DeepZoomViewer widthTile={widthTile} heightTile={heightTile} setViewer2={setViewer} imageSettings={imageSettings} ref={childRef} zoomLevel={zoomLevel} xCoord={xCoord} yCoord={yCoord} annotDetArr={annotArr} Doctor={Doctor} tileName={tileName}></DeepZoomViewer>
+          <DeepZoomViewer widthTile={widthTile} heightTile={heightTile} setViewer2={setViewer} imageSettings={imageSettings} ref={childRef} zoomLevel={zoomLevel} xCoord={xCoord} yCoord={yCoord} annotDetArr={annotArr} Doctor={Doctor} tileName={tileName} scaleSelected={scaleSelected}></DeepZoomViewer>
         </SlidingPane>
-      </div>
+      </div >
 
     </div >
   );

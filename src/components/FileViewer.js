@@ -1,6 +1,6 @@
 import React from "react";
 import { useState } from "react";
-import { Link, useLocation, useNavigate  } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -51,7 +51,7 @@ const FileViewer = (doctorData) => {
   }
 
   const fetchData = async (pathT) => {
-    const path = `http://localhost:5000/${pathT}`; // Replace with your API path
+    const path = `http://localhost:3001/${pathT}`; // Replace with your API path
     const method = 'GET'; // Replace with your method
     const body = {}; // Replace with your body
 
@@ -89,7 +89,7 @@ const FileViewer = (doctorData) => {
         <Modal.Body>
           <ul className="list-group">
             {listReports.map((item, index) => (
-              <li key={index} className="list-group-item" onClick={() => {navigateToPage(item)}}>{item}</li>
+              <li key={index} className="list-group-item" onClick={() => { navigateToPage(item) }}>{item}</li>
             ))}
           </ul>
         </Modal.Body>

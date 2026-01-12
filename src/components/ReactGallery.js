@@ -33,48 +33,48 @@ const ReactGallery = () => {
 
         setLoading(true);
 
-        axios.post('http://localhost:5000/upload-image', formData, {
+        axios.post('http://localhost:3001/upload-image', formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
         })
-        .then(response => {
-            const data = response.data;
-            setChartData({
-                labels: data.labels,
-                datasets: [
-                    {
-                        label: 'Red Channel',
-                        data: data.r,
-                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                        borderColor: 'rgba(255, 99, 132, 1)',
-                        borderWidth: 1,
-                        fill: false,
-                    },
-                    {
-                        label: 'Green Channel',
-                        data: data.g,
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                        borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 1,
-                        fill: false,
-                    },
-                    {
-                        label: 'Blue Channel',
-                        data: data.b,
-                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 1,
-                        fill: false,
-                    }
-                ]
+            .then(response => {
+                const data = response.data;
+                setChartData({
+                    labels: data.labels,
+                    datasets: [
+                        {
+                            label: 'Red Channel',
+                            data: data.r,
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            borderColor: 'rgba(255, 99, 132, 1)',
+                            borderWidth: 1,
+                            fill: false,
+                        },
+                        {
+                            label: 'Green Channel',
+                            data: data.g,
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1,
+                            fill: false,
+                        },
+                        {
+                            label: 'Blue Channel',
+                            data: data.b,
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1,
+                            fill: false,
+                        }
+                    ]
+                });
+                setLoading(false);
+            })
+            .catch(error => {
+                console.error('Error uploading image:', error);
+                setLoading(false);
             });
-            setLoading(false);
-        })
-        .catch(error => {
-            console.error('Error uploading image:', error);
-            setLoading(false);
-        });
     };
 
     const options = {

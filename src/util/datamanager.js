@@ -1,41 +1,41 @@
 
 const fetchData = async (pathT, method, contentType) => {
-    const path = `http://localhost:5000/${pathT}`; // Replace with your API path
-    // const method = 'GET'; // Replace with your method
-    const body = {}; // Replace with your body
+  const path = `http://localhost:3001/${pathT}`; // Replace with your API path
+  // const method = 'GET'; // Replace with your method
+  const body = {}; // Replace with your body
 
-    return new Promise((resolve, reject) => {
-      fetch(path, {
-        method: method,
-        headers: {
+  return new Promise((resolve, reject) => {
+    fetch(path, {
+      method: method,
+      headers: {
         //   'Content-Type': 'application/json'
-          'Content-Type': contentType
+        'Content-Type': contentType
+      }
+    })
+
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
         }
+        return response;
       })
+      .then((data) => {
 
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          return response;
-        })
-        .then((data) => {
+        if (contentType === 'application/json') {
 
-            if(contentType === 'application/json'){
-
-                resolve(data.json())
-            }else{
-                resolve(data);
-            }
-
-          
-        })
-        .catch((error) => {
-          console.error('There was a problem with the fetch operation: ', error);
-          reject(error);
-        });
-    });
-  }
+          resolve(data.json())
+        } else {
+          resolve(data);
+        }
 
 
-  export default {fetchData}
+      })
+      .catch((error) => {
+        console.error('There was a problem with the fetch operation: ', error);
+        reject(error);
+      });
+  });
+}
+
+
+export default { fetchData }

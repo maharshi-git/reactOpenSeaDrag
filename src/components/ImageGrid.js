@@ -1,10 +1,10 @@
 const ImageGrid = () => {
     const images = [
-      "http://127.0.0.1:5000/tile/Maharshi/4525/16/60_50.jpeg",
-      "http://127.0.0.1:5000/tile2/Maharshi/4007/13/36050_4673.jpeg",
-      // "http://127.0.0.1:5000/tile/Maharshi/4007/11/2_0.jpeg",
-      // "http://127.0.0.1:5000/tile/Maharshi/4007/10/0_1.jpeg",
-      // "http://127.0.0.1:5000/tile/Maharshi/4007/10/1_1.jpeg",
+      "http://localhost:3001/tile/Maharshi/4525/16/60_50.jpeg",
+      "http://localhost:3001/tile2/Maharshi/4007/13/36050_4673.jpeg",
+      // "http://localhost:3001/tile/Maharshi/4007/11/2_0.jpeg",
+      // "http://localhost:3001/tile/Maharshi/4007/10/0_1.jpeg",
+      // "http://localhost:3001/tile/Maharshi/4007/10/1_1.jpeg",
     ];
   
     return (

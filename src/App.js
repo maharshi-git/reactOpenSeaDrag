@@ -29,7 +29,7 @@ function App() {
     // window.location.href = 'http://104.154.195.80/webclient/login/?url=%2Fwebclient%2F';
 
     const fetchData = async (pathT) => {
-      const path = `http://localhost:5000/${pathT}`; // Replace with your API path
+      const path = `http://localhost:3001/${pathT}`; // Replace with your API path
       const method = 'GET'; // Replace with your method
       const body = {}; // Replace with your body
 
@@ -74,7 +74,7 @@ function App() {
 
   return (
 
-    <div style={{ marginTop: "1rem" }}>
+    <div>
       {/* <Toolbar style={{ "margin-bottom": "1rem" }} /> */}
       {
         doctorAndReport.length > 0 && <BrowserRouter >
@@ -82,9 +82,9 @@ function App() {
           <Routes>
             <Route path="/" element={<FileViewer doctorData={doctorAndReport} />} />
             <Route path="/about/:Doctor/:tileName" element={<SuspectedTileViewer doctorData={doctorAndReport} />} />
-            <Route path="/gal" element={<ReactGallery doctorData={doctorAndReport}/>} />
+            <Route path="/gal" element={<ReactGallery doctorData={doctorAndReport} />} />
             <Route path="/ImageGrid" element={<ImageGrid />} />
-           {/* <Route path="/OMEROLogin" element={<OmeroLogin/>} />  */}
+            {/* <Route path="/OMEROLogin" element={<OmeroLogin/>} />  */}
 
           </Routes>
         </BrowserRouter>

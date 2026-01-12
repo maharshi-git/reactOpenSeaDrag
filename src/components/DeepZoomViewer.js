@@ -14,7 +14,7 @@ import './openseadragon-filtering.js'
 
 import { Row, Col } from "react-bootstrap";
 
-const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr, imageSettings, setViewer2, Doctor, tileName, widthTile, heightTile }) => {
+const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr, imageSettings, setViewer2, Doctor, tileName, widthTile, heightTile, scaleSelected }) => {
   const viewerRef = useRef();
 
 
@@ -42,8 +42,8 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr, i
 
     const viewer = OpenSeadragon({
       id: "viewer",
-      // prefixUrl:
-      //   "https://cdn.jsdelivr.net/npm/openseadragon@4.1/build/openseadragon/images/",
+      prefixUrl:
+        "https://cdn.jsdelivr.net/npm/openseadragon@4.1/build/openseadragon/images/",
       //   tileSources: tileSources,
       animationTime: 0.5,
       blendTime: 0.1,
@@ -88,7 +88,7 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr, i
     });
 
     viewer.addHandler('canvas-enter', function (event) {
-      if (ctrlPressed) {
+      if (ctrlPressed || scaleSelected) {
         viewer.canvas.style.cursor = 'crosshair';
       }
     });
@@ -101,7 +101,7 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr, i
 
     viewer.addHandler('canvas-click', function (event) {
 
-      if (!event.originalEvent.ctrlKey) {
+      if (!scaleSelected && !event.originalEvent.ctrlKey) {
         return;
       }
 
@@ -235,10 +235,10 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr, i
     });
 
 
-    let image = { "Image": { "Format": "jpeg", "Overlap": 1, "Size": { "Height": heightTile, "Width": widthTile }, "TileSize": 512, "Url": `http://127.0.0.1:5000/tile/${Doctor}/${tileName}/`, "xmlns": "http://schemas.microsoft.com/deepzoom/2008" }, "crossOriginPolicy": 'Anonymous', "ajaxWithCredentials": false, "useCanvas": true }
-    // let image = { "Image": { "Format": "jpeg", "Overlap": 1, "Size": { "Height": heightTile, "Width":  widthTile}, "TileSize": 512, "Url": `http://127.0.0.1:8000/api/open-slide/`, "xmlns": "http://schemas.microsoft.com/deepzoom/2008" }, "crossOriginPolicy": 'Anonymous', "ajaxWithCredentials": false, "useCanvas": true }
-    // let image = { "Image": { "Format": "jpeg", "Overlap": 1, "Size": { "Height": 61440, "Width":60928  }, "TileSize": 512, "Url": `http://127.0.0.1:5000/tile/${Doctor}/${tileName}/`, "xmlns": "http://schemas.microsoft.com/deepzoom/2008" }, "crossOriginPolicy": 'Anonymous', "ajaxWithCredentials": false, "useCanvas": true }
-    // let image = { "Image": { "Format": "jpeg", "Overlap": 1 , "Size": { "Height": 79360, "Width":75264  }, "TileSize": 512, "Url": `http://127.0.0.1:5000/tile/${Doctor}/${tileName}/`, "xmlns": "http://schemas.microsoft.com/deepzoom/2008" }, "crossOriginPolicy": 'Anonymous', "ajaxWithCredentials": false, "useCanvas": true }
+    let image = { "Image": { "Format": "jpeg", "Overlap": 1, "Size": { "Height": heightTile, "Width": widthTile }, "TileSize": 512, "Url": `http://localhost:3001/tile/${Doctor}/${tileName}/`, "xmlns": "http://schemas.microsoft.com/deepzoom/2008" }, "crossOriginPolicy": 'Anonymous', "ajaxWithCredentials": false, "useCanvas": true }
+    // let image = { "Image": { "Format": "jpeg", "Overlap": 1, "Size": { "Height": heightTile, "Width":  widthTile}, "TileSize": 512, "Url": `http://localhost:3001/api/open-slide/`, "xmlns": "http://schemas.microsoft.com/deepzoom/2008" }, "crossOriginPolicy": 'Anonymous', "ajaxWithCredentials": false, "useCanvas": true }
+    // let image = { "Image": { "Format": "jpeg", "Overlap": 1, "Size": { "Height": 61440, "Width":60928  }, "TileSize": 512, "Url": `http://localhost:3001/tile/${Doctor}/${tileName}/`, "xmlns": "http://schemas.microsoft.com/deepzoom/2008" }, "crossOriginPolicy": 'Anonymous', "ajaxWithCredentials": false, "useCanvas": true }
+    // let image = { "Image": { "Format": "jpeg", "Overlap": 1 , "Size": { "Height": 79360, "Width":75264  }, "TileSize": 512, "Url": `http://localhost:3001/tile/${Doctor}/${tileName}/`, "xmlns": "http://schemas.microsoft.com/deepzoom/2008" }, "crossOriginPolicy": 'Anonymous', "ajaxWithCredentials": false, "useCanvas": true }
 
 
     const anno = Annotorious(viewer);
@@ -251,13 +251,13 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr, i
     anno.on('deleteAnnotation', async (annotation) => {
       // console.log(annotation);
       anno.removeAnnotation(annotation.id);
-      await onFetchData('http://127.0.0.1:5000/deleteAnnotation', 'POST', { id: annotation.id })
+      await onFetchData('http://localhost:3001/deleteAnnotation', 'POST', { id: annotation.id })
     });
 
     anno.on("createAnnotation", async function (annotation) {
 
 
-      await onFetchData('http://127.0.0.1:5000/getAnnotation', 'POST', annotation)
+      await onFetchData('http://localhost:3001/getAnnotation', 'POST', annotation)
 
     });
 
@@ -340,7 +340,7 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr, i
   }, [viewer, xCoord, yCoord, zoomLevel]);
 
   const getSavedAnnotation = async () => {
-    let savedData = await onFetchData('http://127.0.0.1:5000/getSavedAnnotation', 'GET',)
+    let savedData = await onFetchData('http://localhost:3001/getSavedAnnotation', 'GET',)
     return savedData;
   };
 
@@ -372,33 +372,12 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr, i
     })
   }
 
-  const updateFilterBrigtness = (filterObj) => {
-    setBrightness(filterObj.target.value);
-    viewer.canvas.style.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
-  };
-  const updateFilterContrast = (filterObj) => {
-    setContrast(filterObj.target.value);
-    viewer.canvas.style.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
-  };
-  const updateFilterGamma = (filterObj) => {
-    setGamma(filterObj.target.value);
-    viewer.canvas.style.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
-  };
-
-  //write a similart method for saturation
-  const updateFilterSaturation = (filterObj) => {
-    setSaturation(filterObj.target.value);
-    viewer.canvas.style.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
-  };
-
-  const resetFilters = function () {
-    setBrightness(100);
-    setContrast(100);
-    setGamma(1);
-    setSaturation(100);
-    viewer.canvas.style.filter = `brightness(${brightness}%) contrast(${contrast}%) saturate(${saturation}%)`;
-
-  };
+  // Apply filters via CSS from parent prop
+  useEffect(() => {
+    if (viewer && viewer.canvas && imageSettings) {
+      viewer.canvas.style.filter = imageSettings;
+    }
+  }, [viewer, imageSettings]);
 
 
   return (
@@ -410,72 +389,7 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr, i
           style={{ width: "100%", height: "850px", padding: "none" }}
         />
 
-        {/* <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            marginLeft: "0.8rem",
-            width: "200px",
-          }}
-        >
-          <button className="btn btn-primary" onClick={resetFilters}>
-            Reset
-          </button>
-          <label>
-            Brightness
-            <input
-              type="range"
-              min="0"
-              max="200"
-              value={brightness}
-              onChange={updateFilterBrigtness}
-              tooltip="true"
-              class="form-range"
-            />
-          </label>
-          <label>
-            Contrast
-            <input
-              type="range"
-              min="0"
-              max="200"
-              value={contrast}
-              onChange={updateFilterContrast}
-              class="form-range"
-            />
-          </label>
-          <label>
-            Gamma
-            <input
-              type="range"
-              min="0"
-              max="5"
-              step="0.1"
-              value={gamma}
-              onChange={updateFilterGamma}
-              class="form-range"
-            />
-          </label>
-          <label>
-            Saturation
-            <input
-              type="range"
-              min="0"
-              max="200"
-              value={saturation}
-              onChange={updateFilterSaturation}
-              class="form-range"
-            />
-          </label>
-          <Row className="info-strip">
-            <Col>zoomLevel : {zoomLevelView}</Col>
-            <Col>viewport Height: {viewportHeight}</Col>
-            <Col>viewport Width: {viewportWidth}</Col>
-            <Col>xCoord: {xCoordMain}</Col>
-            <Col>yCoord: {yCoordMain}</Col>
-          </Row>
-     
-        </div> */}
+
 
 
       </div>
