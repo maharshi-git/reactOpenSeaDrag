@@ -179,6 +179,7 @@ const SuspectedTileViewer = () => {
 
       let Images20, newImgArr = [], newImgArr2;
       let noCalls = Math.floor(imagesArr.length / 12);
+      // noCalls=1
       for (var i = 0; i < noCalls; i++) {
 
         Images20 = imagesArr.slice(i * 12, (i + 1) * 12);
@@ -196,9 +197,18 @@ const SuspectedTileViewer = () => {
 
         })
 
+        // Images20 = [...Images20[0], ...Images20[2]]
+        Images20.forEach((x, index) => {
+
+          x.src2 = listImages[index]
+
+        })
+
         newImgArr = [...newImgArr, ...Images20]
 
         setImages(newImgArr)
+
+        // console.log(noCalls)
       }
 
     }
@@ -253,8 +263,8 @@ const SuspectedTileViewer = () => {
   const handlePageClick = (pageNumber) => {
     if (
       pageNumber < 1
-      ||
-      pageNumber > Math.ceil(images.length / itemsPerPage)
+      // ||
+      // pageNumber > Math.ceil(images.length / itemsPerPage)
     ) {
       return;
     }
@@ -349,7 +359,7 @@ const SuspectedTileViewer = () => {
   const handleSliderChange = (newValue) => {
     setSliderValue(newValue);
     console.log(`Slider values: ${newValue}`);
-};
+  };
 
   return (
     <div>

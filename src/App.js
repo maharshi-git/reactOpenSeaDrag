@@ -11,6 +11,8 @@ import ReactGallery from "./components/ReactGallery";
 // import OmeroLogin from "./components/OMEROLogin";
 import ParentComponent from "./components/ParentComponent";
 
+import ImageGrid from "./components/ImageGrid"
+
 
 import "./App.css";
 
@@ -81,6 +83,7 @@ function App() {
             <Route path="/" element={<FileViewer doctorData={doctorAndReport} />} />
             <Route path="/about/:Doctor/:tileName" element={<SuspectedTileViewer doctorData={doctorAndReport} />} />
             <Route path="/gal" element={<ReactGallery doctorData={doctorAndReport}/>} />
+            <Route path="/ImageGrid" element={<ImageGrid />} />
            {/* <Route path="/OMEROLogin" element={<OmeroLogin/>} />  */}
 
           </Routes>
