@@ -175,7 +175,7 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr, i
       event.preventDefaultAction = true;
     });
 
-   
+
 
     viewer.addHandler("open", function () {
 
@@ -233,9 +233,9 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr, i
 
 
     });
-    
-    
-    let image = { "Image": { "Format": "jpeg", "Overlap": 1, "Size": { "Height": heightTile, "Width":  widthTile}, "TileSize": 512, "Url": `http://127.0.0.1:5000/tile/${Doctor}/${tileName}/`, "xmlns": "http://schemas.microsoft.com/deepzoom/2008" }, "crossOriginPolicy": 'Anonymous', "ajaxWithCredentials": false, "useCanvas": true }
+
+
+    let image = { "Image": { "Format": "jpeg", "Overlap": 1, "Size": { "Height": heightTile, "Width": widthTile }, "TileSize": 512, "Url": `http://127.0.0.1:5000/tile/${Doctor}/${tileName}/`, "xmlns": "http://schemas.microsoft.com/deepzoom/2008" }, "crossOriginPolicy": 'Anonymous', "ajaxWithCredentials": false, "useCanvas": true }
     // let image = { "Image": { "Format": "jpeg", "Overlap": 1, "Size": { "Height": heightTile, "Width":  widthTile}, "TileSize": 512, "Url": `http://127.0.0.1:8000/api/open-slide/`, "xmlns": "http://schemas.microsoft.com/deepzoom/2008" }, "crossOriginPolicy": 'Anonymous', "ajaxWithCredentials": false, "useCanvas": true }
     // let image = { "Image": { "Format": "jpeg", "Overlap": 1, "Size": { "Height": 61440, "Width":60928  }, "TileSize": 512, "Url": `http://127.0.0.1:5000/tile/${Doctor}/${tileName}/`, "xmlns": "http://schemas.microsoft.com/deepzoom/2008" }, "crossOriginPolicy": 'Anonymous', "ajaxWithCredentials": false, "useCanvas": true }
     // let image = { "Image": { "Format": "jpeg", "Overlap": 1 , "Size": { "Height": 79360, "Width":75264  }, "TileSize": 512, "Url": `http://127.0.0.1:5000/tile/${Doctor}/${tileName}/`, "xmlns": "http://schemas.microsoft.com/deepzoom/2008" }, "crossOriginPolicy": 'Anonymous', "ajaxWithCredentials": false, "useCanvas": true }
@@ -324,8 +324,20 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr, i
 
     setViewer(viewer);
 
-  // }, [tileSources]);
   }, []);
+
+  // Effect to update viewer viewport when props change
+  useEffect(() => {
+    if (viewer && xCoord !== undefined && yCoord !== undefined && zoomLevel !== undefined) {
+      // console.log("PanTo:", xCoord, yCoord, "ZoomTo:", zoomLevel);
+      try {
+        viewer.viewport.panTo(new OpenSeadragon.Point(xCoord, yCoord));
+        viewer.viewport.zoomTo(zoomLevel);
+      } catch (error) {
+        console.error("Error updating viewport:", error);
+      }
+    }
+  }, [viewer, xCoord, yCoord, zoomLevel]);
 
   const getSavedAnnotation = async () => {
     let savedData = await onFetchData('http://127.0.0.1:5000/getSavedAnnotation', 'GET',)
