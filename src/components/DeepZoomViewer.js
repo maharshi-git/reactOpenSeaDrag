@@ -410,7 +410,6 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr, i
           style={{ width: "100%", height: "850px", padding: "none" }}
         />
 
-
         {/* <div
           style={{
             display: "flex",
@@ -477,6 +476,8 @@ const DeepZoomViewer = ({ tileSources, zoomLevel, xCoord, yCoord, annotDetArr, i
           </Row>
      
         </div> */}
+
+
       </div>
     </div>
   );
